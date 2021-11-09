@@ -1,36 +1,39 @@
 import datetime
 import hashlib
-import jwt
 import random
 import re
 import string
+import time
+from typing import Optional, Union
 
 from django.conf import settings
+from jwcrypto import jwk, jwt
 from rest_framework import status, serializers
 
 from .models import User
 
 
-def verify_access_token(token):
+def verify_access_token(token: str) -> Union[dict, None]:
     """
     Check is valid access token
     """
 
     if not token:
-        return False
+        raise Exception("No token")
 
-    key = settings.JWT['SIGNING_KEY_ACCESS']
+    key = settings.JWKS
     try:
-        payload = jwt.decode(token, key,
-                             algorithms=[settings.JWT['ALGORITHM']], options={'verify_exp': False})
-    except Exception:
-        return False
+        ET = jwt.JWT(key=key, jwt=token)
+    except jwt.JWTExpired:
+        raise Exception("Token expired")
+    except Exception as e:
+        raise e
 
-    # May be need to delete
-    if datetime.datetime.utcnow().timestamp() > payload['exp']:
-        return False
+    claims = ET.claims
+    if claims['iss'] != settings.ISSUER:
+        raise Exception("Incorrect issuer")
 
-    return True
+    return claims
 
 
 def gen_pair_tokens(user):
@@ -40,40 +43,40 @@ def gen_pair_tokens(user):
 
     payload_for_access_token = {
         'id': user.id,
-        'exp': (datetime.datetime.utcnow() + settings.JWT['ACCESS_TOKEN_LIFETIME']).timestamp(),
-        'iat': datetime.datetime.utcnow().timestamp()
+        'exp': int(time.time()) + int(datetime.timedelta(minutes=10).seconds),
+        'iat': time.time(),
+        'iss': settings.ISSUER,
+        'aud': settings.AUDIENCES
     }
 
     refresh_token = hashlib.md5(
         f'{user.id}{generate_random_string(settings.JWT["LENGTH_STRING_REFRESH_HASH"])}'.encode()).hexdigest()
 
-    access_token = jwt.encode(payload_for_access_token, settings.JWT['SIGNING_KEY_ACCESS'],
-                              algorithm=settings.JWT['ALGORITHM'])
+    key = jwk.JWK(**settings.JWKS)
+    token = jwt.JWT(header={"alg": "HS256"}, claims=payload_for_access_token)
+
+    token.make_signed_token(key)
+    access_token = token.serialize()
+    # access_token = jwt.encode(payload_for_access_token, settings.JWT['SIGNING_KEY_ACCESS'],
+    #                           algorithm=settings.JWT['ALGORITHM'])
 
     user.update_refresh_token(refresh_token)
 
     return (access_token, refresh_token)
 
 
-def get_payload(token):
+def get_payload(token: str) -> Union[dict, None]:
     """
     Get payload of access token
     :param token: access token
     :return: dict payload
     """
 
-    if not verify_access_token(token):
-        raise Exception('No verify token')
-
     try:
-        payload = jwt.decode(token,
-                             settings.JWT['SIGNING_KEY_ACCESS'],
-                             algorithms=settings.JWT['ALGORITHM'],
-                             options={'verify_exp': False}
-                             )
+        payload = verify_access_token(token)
         return payload
-    except:
-        raise Exception('Error in payload')
+    except Exception as e:
+        raise e
 
 
 def validate_email(email: str) -> bool:
@@ -123,10 +126,7 @@ def check_user(request):
     payload = get_payload(token)
 
     user = User.objects.filter(id=payload['id']).first()
-    if not user or not user.is_active:
-        return (None, verify_user(user))
-
-    return user, status.HTTP_200_OK
+    return user if user else None, verify_user(user)
 
 
 def validate_data_for_user(attrs):

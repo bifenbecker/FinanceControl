@@ -1,16 +1,16 @@
-import datetime
+import datetime, json
 
+from django.conf import settings
 from django.http import HttpResponse
 from rest_framework import status, serializers
 from rest_framework import viewsets
-from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User, RefreshToken
 from .producer import publish
 from .serializers import UserSerializer
-from .utils import gen_pair_tokens, verify_access_token, get_payload, verify_user, check_user, validate_data_for_user
+from .utils import gen_pair_tokens, get_payload, verify_user, check_user, validate_data_for_user
 
 
 # Create your views here.
@@ -99,47 +99,33 @@ class LoginView(APIView):
         return response
 
 
-class UserView(APIView):
-
-    def post(self, request):
-        token = request.data.get('access_token')
-
-        if not verify_access_token(token):
-            raise AuthenticationFailed('Unauthenticated!')
-
-        payload = get_payload(token)
-
-        user = User.objects.filter(id=payload['id']).first()
-        response = Response()
-        response.status_code = verify_user(user)
-        if not user or not user.is_active:
-            return response
-
-        serializer = UserSerializer(user)
-        response.data = serializer.data
-        return response
-
-
-class LogoutView(APIView):
-    def post(self, request):
-        response = Response()
-        response.delete_cookie('jwt')
-        response.data = {
-            'message': 'success'
-        }
-        return response
-
-
 class VerifyTokenView(APIView):
     def post(self, request):
-        if verify_access_token(request.data.get('token')):
-            return Response({
-                'Result': 'OK'
-            })
-        else:
-            return Response({
-                'Result': 'error'
-            })
+        print("POST")
+        print(request.data)
+        print(request.headers)
+        return Response(status=status.HTTP_200_OK)
+        # if verify_access_token(request.data.get('token')):
+        #     return Response({
+        #         'Result': 'OK'
+        #     }, status=status.HTTP_200_OK)
+        # else:
+        #     return Response({
+        #         'Result': 'error'
+        #     }, status=status.HTTP_401_UNAUTHORIZED)
+
+    def get(self, request):
+        print("GET")
+        print(request.data)
+        print(request.headers)
+        return Response(status=status.HTTP_200_OK)
+
+
+def json_token(request):
+    data = {
+        "keys": [settings.JWKS]
+    }
+    return HttpResponse(json.dumps(data))
 
 
 class RefreshTokenView(APIView):
@@ -153,11 +139,11 @@ class RefreshTokenView(APIView):
             return Response({
                 'access_token': access_token,
                 'refresh_token': refresh_token
-            })
+            }, status=status.HTTP_200_OK)
         else:
             return Response({
                 'error': 'No verify token'
-            })
+            }, status=status.HTTP_403_FORBIDDEN)
 
 
 def hello(request):

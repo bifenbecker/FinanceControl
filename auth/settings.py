@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-import os, environ
+import environ
+import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -17,7 +18,6 @@ env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -31,8 +31,7 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost *").split(" ")
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 DEBUG = env('DEBUG', default=1)
-
-
+IS_LOCAL = os.environ.get("IS_LOCAL", True)
 
 # Application definition
 
@@ -85,7 +84,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'auth.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -109,7 +107,6 @@ DATABASES = {
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -145,7 +142,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/auth/static/'
 STATIC_ROOT = '/usr/src/app/static/'
 
 AUTH_USER_MODEL = 'user.User'
@@ -153,7 +150,7 @@ AUTH_USER_MODEL = 'user.User'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-
+# region JWT SETTINGS
 JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
@@ -161,3 +158,26 @@ JWT = {
     'SIGNING_KEY_ACCESS': SECRET_KEY + "_access",
     'LENGTH_STRING_REFRESH_HASH': 10
 }
+
+ISSUER = 'auth_cluster'
+AUDIENCES = [
+    'banks'
+]
+
+JWKS = {
+    "k": SECRET_KEY,
+    "kid": SECRET_KEY,
+    "kty": "oct"
+}
+# endregion
+
+
+# region HTTPS
+if not IS_LOCAL:
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# endregion

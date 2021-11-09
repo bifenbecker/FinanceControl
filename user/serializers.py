@@ -9,7 +9,7 @@ from .utils import validate_data_for_user
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'name', 'email', 'password']
+        fields = ['id', 'username', 'name', 'email', 'password', 'is_active']
 
     def validate(self, attrs):
         try:
