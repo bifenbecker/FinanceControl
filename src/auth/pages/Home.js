@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -46,7 +46,9 @@ const UserInfo = (props) => {
                 </Box>
     }
     else if(props.isEdit === true){
-        list = <Box sx={{ '& button': { m: 1 } }}>
+        
+        list = <form ref={props.formRef}>
+                <Box sx={{ '& button': { m: 1 } }}>
                     <div className="m-5">
                         <TextField
                             id="standard-required"
@@ -77,6 +79,7 @@ const UserInfo = (props) => {
                         />
                     </div>
                 </Box>
+                </form>
     }
 
     return (
@@ -91,57 +94,70 @@ const Home = (props) => {
     const [name, setName] = useState('');
     const [username, setUserName] = useState('');
     const [email, setEmail] = useState('');
+    const formRef = useRef();
 
 
     const confirm_edit = async () => {
-        let new_data = {};
-        if(name !== props.user.name && name !== ''){
-            new_data['name'] = name;
-        }
-        if(username !== props.user.username && username !== ''){
-            new_data['username'] = username;
-        }
-        if(email !== props.user.email && email !== ''){
-            new_data['email'] = email;
-        }
-        if(JSON.stringify(new_data) !== '{}'){
-            const response = await edit_user(new_data);
-            if(response.status === 401){
-                props.setUser(undefined);
-                localStorage.removeItem('access_token');
-                localStorage.removeItem('refresh_token');
+        if(props.user !== undefined){
+            let new_data = {};
+            if(name !== props.user.name && name !== ''){
+                new_data['name'] = name;
             }
-            else if(response.status === 202){
-                window.location.reload();
+            if(username !== props.user.username && username !== ''){
+                new_data['username'] = username;
             }
+            if(email !== props.user.email && email !== ''){
+                new_data['email'] = email;
+            }
+            if(JSON.stringify(new_data) !== '{}'){
+                const response = await edit_user(new_data);
+                if(response.status === 401){
+                    props.setUser(undefined);
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+                }
+                else if(response.status === 202){
+                    const content = await response.json();
+                    props.setUser(content);
+                }
+            }       
+            setEditState(false);
         }
         else{
-            console.log('old');
+            window.location.reload();
         }
-        
-        setEditState(false);
     }
+
     const cancel = () => {
-        console.log('cancel');
+        formRef.current.reset();
+        setName('');
+        setEmail('');
+        setUserName('');
         setEditState(false);
     }
 
     const deleteUser = () => {
-        console.log('deleteMe');
-        let isDelete = window.confirm('delete');
-        if(isDelete === true){
-            delete_user();
+        if(props.user !== undefined){
+            let isDelete = window.confirm('delete');
+            if(isDelete === true){
+                delete_user();
+                window.location.reload();
+            }
+        }
+        else{
             window.location.reload();
         }
     }
 
     let button;
 
-    if(isEdit === false){
+    if(isEdit === false && props.user !== undefined){
         button = <Box sx={{ '& button': { m: 2 } }}>
+                    {props.user.is_active?
                     <Button variant="contained" size="small" onClick={() => {setEditState(true)}}>
                         EDIT
                     </Button>
+                    : null}
                     <Button variant="contained" size="small" onClick={deleteUser} endIcon={<DeleteIcon />}>
                         DELETE ME
                     </Button>
@@ -157,12 +173,11 @@ const Home = (props) => {
                     </Button>
                 </Box>
     }
-
     return (
         props.user?
         <div>
-            {'Hi, ' + props.user.name}
-            <UserInfo user={props.user} isEdit={isEdit} setName={setName} setEmail={setEmail} setUserName={setUserName}/>
+            {`Hi, ${props.user.name}  ${props.user.is_active? "": ", you are blocked"}`}
+            <UserInfo user={props.user} isEdit={isEdit} formRef={formRef} setName={setName} setEmail={setEmail} setUserName={setUserName}/>
             {button}
         </div> 
         :

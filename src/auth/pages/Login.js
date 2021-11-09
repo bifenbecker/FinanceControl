@@ -3,7 +3,7 @@ import React, {SyntheticEvent, useState} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import {login , get_user} from '../utils';
+import { login, get_user } from '../utils';
 
 
 const Login = (props) => {
