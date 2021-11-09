@@ -1,0 +1,65 @@
+version: '3.7'
+services:
+  rabbitmq3:
+    # image: rabbitmq:3-management
+    build: ./rabbitmq
+    ports:
+      # AMQP protocol port
+      - '5672:5672'
+      # HTTP management UI
+      - '15672:15672'
+
+  envoy:
+    image: envoyproxy/envoy-dev
+    volumes:
+      # - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
+      - ./envoy/envoy-jwt.yaml:/etc/envoy/envoy.yaml
+    ports:
+      - 10000:10000
+    depends_on:
+      - rabbitmq3
+
+  auth:
+    build: ./auth
+    command: python manage.py runserver 0.0.0.0:8000 
+    volumes:
+      - ./auth:/usr/src/auth/
+    ports:
+      - 8000:8000
+    env_file:
+      - ./auth/.env.dev
+    depends_on:
+      - envoy
+
+  banks:
+    build: ./banks
+    command: python manage.py runserver 0.0.0.0:8001
+    volumes:
+      - ./banks/:/usr/src/banks/
+    ports:
+      - 8001:8001
+    env_file:
+      - ./banks/.env.dev
+    depends_on:
+      - envoy
+
+  queue_auth:
+    build: ./auth
+    command: python consumer.py
+    environment:
+      - RABBITMQ_HOST=rabbitmq3
+    depends_on:
+      - rabbitmq3
+
+  queue_banks:
+    build: ./banks
+    command: python consumer.py
+    environment:
+      - RABBITMQ_HOST=rabbitmq3
+    depends_on:
+      - rabbitmq3
+
+networks:
+  mynetwork:
+    external:
+      name: mynetwork
