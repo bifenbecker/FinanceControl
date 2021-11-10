@@ -15,12 +15,7 @@ function App() {
           (
             async () => {
               if(localStorage.getItem('access_token') !== null){
-                  const response = await get_user(
-                    JSON.stringify({
-                      access_token: localStorage.getItem('access_token')
-                      })
-                  )
-    
+                  const response = await get_user();
                   
                   if(response.status === 200 || response.status === 423){
                     const content = await response.json();

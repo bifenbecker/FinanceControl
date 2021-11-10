@@ -12,30 +12,30 @@ import { create_bank } from '../utils';
 
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, ref) {
     const { onChange, ...other } = props;
-  
+    
     return (
-      <NumberFormat
+        <NumberFormat
         {...other}
         getInputRef={ref}
         onValueChange={(values) => {
-          onChange({
-            target: {
-              name: props.name,
-              value: values.value,
-            },
-          });
+            onChange({
+                target: {
+                name: props.name,
+                value: values.value,
+                },
+            });
         }}
-        thousandSeparator
-        isNumericString
-        prefix="$" //TODO: Load from settings 
-      />
+            thousandSeparator
+            isNumericString
+            prefix="$" //TODO: Load from settings 
+        />
     );
-  });
-  
-  NumberFormatCustom.propTypes = {
-    name: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
-  };
+    });
+    
+    NumberFormatCustom.propTypes = {
+        name: PropTypes.string.isRequired,
+        onChange: PropTypes.func.isRequired,
+    };
 
 
 const CreateBank = (props) => {
@@ -67,20 +67,20 @@ const CreateBank = (props) => {
 
     const submit = async () => {
         if(validate(name, balance)){
-          const response = await create_bank({
-            name,
-            balance
-          })
-          if(response.status === 200){
-              setError('');
-          }
-          else if(response.status === 401){
-              window.location.reload();
-          }
-          else{
-              const content = await response.json();
-              setError(content);
-          }
+            const response = await create_bank({
+                name,
+                balance
+            })
+            if(response.status === 200){
+                setError('');
+            }
+            else if(response.status === 401){
+                window.location.reload();
+            }
+            else{
+                const content = await response.json();
+                setError(content);
+            }
         }
     }
 
