@@ -27,6 +27,9 @@ static_resources:
                   prefix: "/banks"
                 route:
                   cluster: banks_cluster
+            cors:
+                        allow_origin_string_match:
+                          - prefix: "*"
 
   clusters:
     - name: auth_cluster
