@@ -1,4 +1,5 @@
-import datetime, json
+import datetime
+import json
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -8,28 +9,23 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User, RefreshToken
-from .producer import publish
 from .serializers import UserSerializer
-from .utils import gen_pair_tokens, get_payload, verify_user, check_user, validate_data_for_user
+from .utils import gen_pair_tokens, verify_user, validate_data_for_user, all_methods_check_token
 
 
-# Create your views here.
+
+@all_methods_check_token
 class UserViewSet(viewsets.ViewSet):
     def list(self, request):
         pass
 
-    def retrieve(self, request):
-        user, code = check_user(request)
-        response = Response(status=code)
-        if user:
-            serializer = UserSerializer(user)
-            response.data = serializer.data
-        return response
+    def retrieve(self, request, *args, **kwargs):
+        serializer = UserSerializer(kwargs['user'])
+        return serializer.data, status.HTTP_200_OK
 
-    def update(self, request):
-        user, code = check_user(request)
-        response = Response(status=code)
-        if user:
+    def update(self, request, *args, **kwargs):
+        user = kwargs['user']
+        if user.is_active:
             try:
                 validate_data_for_user(request.data)
                 for key in request.data:
@@ -38,26 +34,20 @@ class UserViewSet(viewsets.ViewSet):
 
                 user.save()
                 serializer = UserSerializer(user)
-                response.data = serializer.data
-                response.status_code = status.HTTP_202_ACCEPTED
+                return serializer.data, status.HTTP_202_ACCEPTED
 
             except serializers.ValidationError as e:
-                response.data = {'msg': e.get_full_details()[0]['message']}
-                response.status_code = status.HTTP_304_NOT_MODIFIED
+                return {'msg': e.get_full_details()[0]['message']}, status.HTTP_304_NOT_MODIFIED
 
             except Exception as e:
-                response.data = {'msg': str(e)}
-                response.status_code = status.HTTP_304_NOT_MODIFIED
+                return {'msg': str(e)}, status.HTTP_304_NOT_MODIFIED
+        else:
+            return {'msg': 'User was blocked'}, status.HTTP_423_LOCKED
 
-        return response
-
-    def destroy(self, request):
-        user, code = check_user(request)
-        response = Response(status=code)
-        if user:
-            user.delete()
-            response.status_code = status.HTTP_202_ACCEPTED
-        return response
+    def destroy(self, request, *args, **kwargs):
+        user = kwargs['user']
+        user.delete()
+        return {'msg': 'User was deleted'}, status.HTTP_202_ACCEPTED
 
 
 class RegisterView(APIView):
@@ -73,19 +63,27 @@ class LoginView(APIView):
         email = request.data['email']
         password = request.data['password']
 
-        user = User.objects.filter(email=email).first()
         response = Response()
-        response.status_code = verify_user(user)
+        user = User.objects.filter(email=email).first()
         if user is None:
             response.data = {
                 'email': 'User not found!'
             }
-
+            response.status_code = status.HTTP_404_NOT_FOUND
             return response
 
         if not user.check_password(password):
             response.data = {
                 'password': 'Incorrect password!'
+            }
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return response
+
+        verified_user, response.status_code = verify_user(user)
+
+        if not verified_user:
+            response.data = {
+                'msg': 'No user'
             }
             return response
 
@@ -97,28 +95,6 @@ class LoginView(APIView):
             'refresh_token': refresh_token
         }
         return response
-
-
-class VerifyTokenView(APIView):
-    def post(self, request):
-        print("POST")
-        print(request.data)
-        print(request.headers)
-        return Response(status=status.HTTP_200_OK)
-        # if verify_access_token(request.data.get('token')):
-        #     return Response({
-        #         'Result': 'OK'
-        #     }, status=status.HTTP_200_OK)
-        # else:
-        #     return Response({
-        #         'Result': 'error'
-        #     }, status=status.HTTP_401_UNAUTHORIZED)
-
-    def get(self, request):
-        print("GET")
-        print(request.data)
-        print(request.headers)
-        return Response(status=status.HTTP_200_OK)
 
 
 def json_token(request):
@@ -144,8 +120,3 @@ class RefreshTokenView(APIView):
             return Response({
                 'error': 'No verify token'
             }, status=status.HTTP_403_FORBIDDEN)
-
-
-def hello(request):
-    publish()
-    return HttpResponse('Hello world')

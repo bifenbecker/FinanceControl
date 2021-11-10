@@ -1,14 +1,17 @@
 import datetime
 import hashlib
+import json
 import random
 import re
 import string
 import time
-from typing import Optional, Union
+from typing import Union
 
 from django.conf import settings
 from jwcrypto import jwk, jwt
 from rest_framework import status, serializers
+from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet
 
 from .models import User
 
@@ -21,7 +24,7 @@ def verify_access_token(token: str) -> Union[dict, None]:
     if not token:
         raise Exception("No token")
 
-    key = settings.JWKS
+    key = jwk.JWK(**settings.JWKS)
     try:
         ET = jwt.JWT(key=key, jwt=token)
     except jwt.JWTExpired:
@@ -29,7 +32,8 @@ def verify_access_token(token: str) -> Union[dict, None]:
     except Exception as e:
         raise e
 
-    claims = ET.claims
+    claims = json.loads(ET.claims)
+
     if claims['iss'] != settings.ISSUER:
         raise Exception("Incorrect issuer")
 
@@ -57,26 +61,10 @@ def gen_pair_tokens(user):
 
     token.make_signed_token(key)
     access_token = token.serialize()
-    # access_token = jwt.encode(payload_for_access_token, settings.JWT['SIGNING_KEY_ACCESS'],
-    #                           algorithm=settings.JWT['ALGORITHM'])
 
     user.update_refresh_token(refresh_token)
 
     return (access_token, refresh_token)
-
-
-def get_payload(token: str) -> Union[dict, None]:
-    """
-    Get payload of access token
-    :param token: access token
-    :return: dict payload
-    """
-
-    try:
-        payload = verify_access_token(token)
-        return payload
-    except Exception as e:
-        raise e
 
 
 def validate_email(email: str) -> bool:
@@ -102,31 +90,21 @@ def generate_random_string(length: int) -> str:
     return rand_string
 
 
-def verify_user(user):
+def verify_user(user: Union[int, User]):
     """
     Check status of user
     :params: user - User
     :return: status_code
     """
+    if isinstance(user, int):
+        user = User.objects.filter(id=user).first()
 
     if not user:
-        return status.HTTP_404_NOT_FOUND
+        return None, status.HTTP_404_NOT_FOUND
     elif not user.is_active:
-        return status.HTTP_423_LOCKED
+        return user, status.HTTP_423_LOCKED
 
-    return status.HTTP_200_OK
-
-
-def check_user(request):
-    token = request.data.get('access_token')
-
-    if not verify_access_token(token):
-        return (None, status.HTTP_401_UNAUTHORIZED)
-
-    payload = get_payload(token)
-
-    user = User.objects.filter(id=payload['id']).first()
-    return user if user else None, verify_user(user)
+    return user, status.HTTP_200_OK
 
 
 def validate_data_for_user(attrs):
@@ -157,3 +135,70 @@ def validate_data_for_user(attrs):
         raise serializers.ValidationError('Incorrect email')
 
     return True
+
+
+def process_response(func):
+    """
+    Return data and status code
+    :param func:
+    :return:
+    """
+
+    def wrapper(*args, **kwargs):
+        data, response_status_code = func(*args, **kwargs)
+        return Response(
+            data=data,
+            status=response_status_code
+        )
+
+    return wrapper
+
+
+def check_token(func):
+    def wrapper(request, *args, **kwargs):
+        try:
+            access_token = request.headers.get('jwt-assertion')
+        except:
+            return "No token", status.HTTP_400_BAD_REQUEST
+
+        try:
+            claims = verify_access_token(access_token)
+            kwargs.update({'claims': claims})
+            user, status_code = verify_user(claims['id'])
+            if status_code in [200, 423]:
+                kwargs.update({'user': user})
+                res = func(request, *args, **kwargs)
+                return res
+            else:
+                return {}, status_code
+        except Exception as e:
+            return str(e), status.HTTP_400_BAD_REQUEST
+
+    return wrapper
+
+
+def all_methods_check_token(cls):
+    """
+    Each method get payload from headers
+    :param cls: Class
+    :return: Class
+    """
+
+    class Cls(ViewSet):
+        def __init__(self, *args, **kwargs):
+            self._obj = cls(*args, **kwargs)
+
+        def __getattribute__(self, item):
+            try:
+                x = super().__getattribute__(item)
+            except:
+                pass
+            else:
+                return x
+            attr = self._obj.__getattribute__(item)
+            if isinstance(attr, type(self.__init__)):
+                return check_token(process_response(attr))
+            else:
+                return attr
+
+    return Cls
