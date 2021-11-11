@@ -109,7 +109,7 @@ const Home = (props) => {
             if(email !== props.user.email && email !== ''){
                 new_data['email'] = email;
             }
-            if(JSON.stringify(new_data) !== '{}'){
+            if(JSON.stringify(new_data) !== '{}' && localStorage.getItem('access_token') !== undefined){
                 const response = await edit_user(new_data);
                 if(response.status === 401){
                     props.setUser(undefined);
@@ -120,6 +120,9 @@ const Home = (props) => {
                     const content = await response.json();
                     props.setUser(content);
                 }
+            }
+            else{
+                window.location.reload();
             }       
             setEditState(false);
         }

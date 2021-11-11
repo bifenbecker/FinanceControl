@@ -79,7 +79,7 @@ const Register = (props) => {
                 setErrorEmail(content.email[0]);
             }
             if(response.status === 201){
-                props.setValue('2');
+                props.setNavValue('2');
             }
             
         }

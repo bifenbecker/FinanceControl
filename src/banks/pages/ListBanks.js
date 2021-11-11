@@ -3,11 +3,15 @@ import { bank_list } from '../utils';
 import Grid from '@mui/material/Grid';
 import { ThemeProvider, createTheme } from '@mui/system';
 import Box from '@mui/material/Box';
+import { green, purple } from '@mui/material/colors';
 
-const Bank = (props) => {
+const BankPrev = (props) => {
 
     const theme = createTheme({
         palette: {
+            primary: {
+                main: purple[500],
+            },
             background: {
                 paper: '#fff',
             },
@@ -24,6 +28,10 @@ const Bank = (props) => {
         },
     });
 
+    const select = () => {
+        props.setActiveBank(props.bank);
+        props.setValue("3");
+    }
 
     return (
         <div>
@@ -34,12 +42,15 @@ const Bank = (props) => {
                         bgcolor: 'background.paper',
                         m: 1,
                         p: 1,
-                        width: '8rem',
-                        height: '5rem',
+                        
                     }}
                 >
-                    <Box sx={{ color: 'text.secondary' }}>{props.bank.name}</Box>
-                    <Box sx={{ color: 'text.primary', fontSize: 34, fontWeight: 'medium' }}>
+                    <Box sx={{ color: 'text.secondary', fontSize: 25, fontWeight: 'medium' }}
+                        onClick={select}
+                    >
+                        {props.bank.name}
+                    </Box>
+                    <Box sx={{ color: 'text.primary', fontSize: 22 }}>
                     {props.bank.balance}
                     </Box>
                     <Box
@@ -51,9 +62,6 @@ const Bank = (props) => {
                     }}
                     >
                     +18.77%
-                    </Box>
-                    <Box sx={{ color: 'text.secondary', display: 'inline', fontSize: 12 }}>
-                    
                     </Box>
                 </Box>
             </ThemeProvider>
@@ -74,7 +82,7 @@ const ListBanks = (props) => {
                     window.location.reload();
                 }
                 else if(response.status === 200){
-                    setBankList(content.map((bank) => <Bank bank={bank}/>));
+                    setBankList(content.map((bank) => <BankPrev bank={bank} setValue={props.setValue} setActiveBank={props.setActiveBank}/>));
                 } 
             }
         )();
@@ -82,7 +90,9 @@ const ListBanks = (props) => {
 
     return (
         <div>
-            List
+            <Box sx={{ color: 'text.primary', fontSize: 28, fontWeight: 'medium' }}>
+                My banks
+            </Box>
             {bankList}
         </div>
     );

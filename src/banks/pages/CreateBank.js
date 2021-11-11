@@ -38,6 +38,7 @@ const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, r
     };
 
 
+
 const CreateBank = (props) => {
     const [name, setBankName] = React.useState('');
     const [balance, setBankBalance] = React.useState(0.0);
@@ -71,7 +72,7 @@ const CreateBank = (props) => {
                 name,
                 balance
             })
-            if(response.status === 200){
+            if(response.status === 200 || response.status === 202){
                 setError('');
             }
             else if(response.status === 401){

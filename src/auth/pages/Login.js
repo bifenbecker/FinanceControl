@@ -54,7 +54,7 @@ const Login = (props) => {
             else{
                 localStorage.setItem("access_token", content['access_token']);
                 localStorage.setItem("refresh_token", content['refresh_token']);
-                props.setValue('1');
+                props.setNavValue('1');
                 response = await get_user(JSON.stringify({
                     access_token: localStorage.getItem('access_token')
                 }));

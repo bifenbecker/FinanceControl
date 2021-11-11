@@ -32,10 +32,12 @@ export async function get_user(){
 
 
 export async function edit_user(body){
-    body['access_token'] = localStorage.getItem('access_token');
     const response = await fetch(`${HOST}/${SERVICE_NAME}/api/user`, {
                 method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
+                headers: {
+                    'Content-Type': 'application/json',
+                    "jwt-assertion": localStorage.getItem('access_token')
+                    },
                 credentials: 'include',
                 body: JSON.stringify(body)
             });
@@ -45,11 +47,8 @@ export async function edit_user(body){
 export async function delete_user(){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/api/user`, {
                 method: 'DELETE',
-                headers: {'Content-Type': 'application/json'},
-                credentials: 'include',
-                body: JSON.stringify({
-                    access_token: localStorage.getItem('access_token')
-                })
+                headers: {"jwt-assertion": localStorage.getItem('access_token')},
+                credentials: 'include'
             });
     return response;
 }
