@@ -31,33 +31,25 @@ services:
     depends_on:
       - envoy
 
-  banks:
-    build: ./banks
+  bank_accounts:
+    build: ./bankAccounts
     command: python manage.py runserver 0.0.0.0:8001
     volumes:
-      - ./banks/:/usr/src/banks/
+      - ./bankAccounts/:/usr/src/bankAccounts/
     ports:
       - 8001:8001
     env_file:
-      - ./banks/.env.dev
+      - ./bankAccounts/.env.dev
     depends_on:
       - envoy
 
-  queue_auth:
-    build: ./auth
-    command: python consumer.py
-    environment:
-      - RABBITMQ_HOST=rabbitmq3
-    depends_on:
-      - rabbitmq3
-
-  queue_banks:
-    build: ./banks
-    command: python consumer.py
-    environment:
-      - RABBITMQ_HOST=rabbitmq3
-    depends_on:
-      - rabbitmq3
+  # queue_auth:
+  #   build: ./auth
+  #   command: python consumer.py
+  #   environment:
+  #     - RABBITMQ_HOST=rabbitmq3
+  #   depends_on:
+  #     - rabbitmq3
 
 networks:
   mynetwork:
