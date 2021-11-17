@@ -33,7 +33,7 @@ const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, r
     };
 
 
-export default function EditBank(props) {
+export default function EditBill(props) {
     const [newName, setNewName] = useState('');
     const [newBalance, setNewBalance] = useState('');
 

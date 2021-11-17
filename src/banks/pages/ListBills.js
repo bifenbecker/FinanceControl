@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import { bank_list } from '../utils';
+import { bill_list } from '../utils';
 import Grid from '@mui/material/Grid';
 import { ThemeProvider, createTheme } from '@mui/system';
 import Box from '@mui/material/Box';
 import { green, purple } from '@mui/material/colors';
 
-const BankPrev = (props) => {
+const BillPrev = (props) => {
 
     const theme = createTheme({
         palette: {
@@ -70,19 +70,19 @@ const BankPrev = (props) => {
 }
 
 
-const ListBanks = (props) => {
+const ListBills = (props) => {
     const [bankList, setBankList] = useState(undefined);
 
     useEffect(() => {
         (
             async () => {
-                const response = await bank_list();
+                const response = await bill_list();
                 const content = await response.json();
                 if(response.status === 401){
                     window.location.reload();
                 }
                 else if(response.status === 200){
-                    setBankList(content.map((bank) => <BankPrev bank={bank} setValue={props.setValue} setActiveBank={props.setActiveBank}/>));
+                    setBankList(content.map((bank) => <BillPrev bank={bank} setValue={props.setValue} setActiveBank={props.setActiveBank}/>));
                 } 
             }
         )();
@@ -91,11 +91,11 @@ const ListBanks = (props) => {
     return (
         <div>
             <Box sx={{ color: 'text.primary', fontSize: 28, fontWeight: 'medium' }}>
-                My banks
+                My bills
             </Box>
             {bankList}
         </div>
     );
 }
 
-export default ListBanks;
+export default ListBills;

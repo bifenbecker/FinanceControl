@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';
 
-import { create_bank } from '../utils';
+import { create_bill } from '../utils';
 
 
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, ref) {
@@ -39,7 +39,7 @@ const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, r
 
 
 
-const CreateBank = (props) => {
+const CreateBill = (props) => {
     const [name, setBankName] = React.useState('');
     const [balance, setBankBalance] = React.useState(0.0);
     const [error, setError] = React.useState('');
@@ -68,7 +68,7 @@ const CreateBank = (props) => {
 
     const submit = async () => {
         if(validate(name, balance)){
-            const response = await create_bank({
+            const response = await create_bill({
                 name,
                 balance
             })
@@ -87,7 +87,7 @@ const CreateBank = (props) => {
 
     return (
         <div className="p-5">
-            <h1 className="h3 mb-3 fw-normal">Create bank</h1>
+            <h1 className="h3 m-5 mt-0 fw-normal">Create bill</h1>
             <Box
                 component="form"
                 sx={{
@@ -96,7 +96,7 @@ const CreateBank = (props) => {
                 noValidate
                 autoComplete="off"
                 >
-                <div className="m-5">
+                <div className="mb-5">
                     <TextField
                         required
                         id="outlined-required"
@@ -107,7 +107,7 @@ const CreateBank = (props) => {
                     />
                 </div>
                 
-                <div className="m-5">
+                <div className="mb-5">
                     <TextField
                         label="Start balance"
                         value={balance}
@@ -122,12 +122,16 @@ const CreateBank = (props) => {
                 </div>
                 
             </Box>
-            <Button variant="outlined" onClick={submit}>CREATE</Button>
-            <p className="mt-5">
-                {error !== ''? error: ''}
-            </p>
+            <div class="row">
+                <div class="col text-center">
+                <Button variant="outlined" onClick={submit}>CREATE</Button>
+                <p className="mt-5">
+                    {error !== ''? error: ''}
+                </p>
+                </div>
+            </div>
         </div>
     );
 }
 
-export default CreateBank;
+export default CreateBill;

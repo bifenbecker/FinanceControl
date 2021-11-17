@@ -9,7 +9,7 @@ import { get_user } from './auth/utils';
 
 function App() {
     const [user, setUser] = useState(undefined);
-    document.title = 'Auth app';
+    document.title = 'Finance Contorol';
 
     useEffect(() => {
           (

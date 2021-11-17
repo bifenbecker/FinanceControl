@@ -18,7 +18,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 
-import EditBank from '../components/EditBank';
+import EditBill from '../components/EditBill';
 
 
 function TabPanel(props) {
@@ -66,7 +66,7 @@ const fabGreenStyle = {
 };
 
 
-const Bank = (props) => {
+const Bill = (props) => {
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
 
@@ -168,7 +168,7 @@ const Bank = (props) => {
                             List of operations
                         </TabPanel>
                         <TabPanel value={value} index={1} dir={theme.direction}>
-                            <EditBank bank={props.bank}/>
+                            <EditBill bank={props.bank}/>
                         </TabPanel>
                     </SwipeableViews>
                     {fabs.map((fab, index) => (
@@ -193,4 +193,4 @@ const Bank = (props) => {
     );
 }
 
-export default Bank;
+export default Bill;
