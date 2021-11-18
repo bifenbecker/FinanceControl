@@ -54,8 +54,7 @@ export async function create_category(body){
                     'Content-Type': 'application/json',
                     'jwt-assertion': localStorage.getItem('access_token')
                 },
-                credentials: 'include',
-                body: body
+                body: JSON.stringify(body)
             });
     return response;
 }

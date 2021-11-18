@@ -6,7 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import CategoryList from './CategoryList';
 import TextField from '@mui/material/TextField';
 
-import {create_category} from '../utils';
+import {create_category} from '../utils'
 
 const style = {
     position: 'absolute',
@@ -38,20 +38,21 @@ const ChooseCategoryModal = (props) => {
         }
     }
     
-    const create_category = async () => {
+    const add_category = async (e) => {
+        
         if(categoryNameCreate !== ""){
             var name = categoryNameCreate;
             var isIncome = props.isIncome;
-            var body = JSON.stringify({
-                name,
-                isIncome
-            })
-            console.log(body);
+            var body = {
+                name: name,
+                isIncome: isIncome
+            }
             
             const response = await create_category(body);
             const content = await response.json();
             props.categoryList.push(content);   
         }
+        setIsClickedCreateCategory(false);
     }
 
     return (
@@ -65,8 +66,11 @@ const ChooseCategoryModal = (props) => {
         >
             <Box sx={style}>
                 <CategoryList handleClose={handleClose} categoryList={props.categoryList} isIncome={props.isIncome} setCategory={props.setCategory}/>
-                <Box>
-                        <Fab sx={{ color: 'success.dark', bgcolor: '#B9C4C9', mr: 3}} aria-label="add" onClick={create_category}>
+                
+                {
+                    isClickedCreateCategory?
+                    <Box>
+                        <Fab sx={{ color: 'success.dark', bgcolor: '#B9C4C9', mr: 3}} aria-label="add" onClick={add_category}>
                         <AddIcon />
                         </Fab>
                         <TextField
@@ -77,14 +81,11 @@ const ChooseCategoryModal = (props) => {
                             color="error"
                         />
                     </Box>
-                {/* {
-                    isClickedCreateCategory?
-                    
                     : 
                     <Fab sx={{ color: 'success.dark', bgcolor: '#B9C4C9', mr: 3}} aria-label="add" onClick={show}>
                         <AddIcon />
                     </Fab>
-                } */}
+                }
                 
             </Box>
         </Modal>

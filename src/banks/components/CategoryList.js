@@ -53,8 +53,8 @@ const CategoryList = (props) => {
                     maxWidth: 360,
                     bgcolor: '#52958B',
                     // position: 'relative',
-                    // overflow: 'auto',
-                    maxHeight: 100,
+                    overflow: 'auto',
+                    maxHeight: '100%',
                     '& ul': { padding: 0 },
                     
                 }}
