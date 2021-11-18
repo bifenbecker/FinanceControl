@@ -5,7 +5,6 @@ from typing import Union, Optional
 from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.viewsets import ViewSet
 
 from bills.models import Bill
 from operations.models import Operation, OperationToBill, CategoryToUser
@@ -177,24 +176,26 @@ def all_methods_get_payload(cls):
     :return: Class
     """
 
-    class Cls(ViewSet):
-        def __init__(self, *args, **kwargs):
-            self._obj = cls(*args, **kwargs)
+    def wrapper(arg):
+        class Cls(cls):
+            def __init__(self, *args, **kwargs):
+                self._obj = arg(*args, **kwargs)
 
-        def __getattribute__(self, item):
-            try:
-                x = super().__getattribute__(item)
-            except:
-                pass
-            else:
-                return x
-            attr = self._obj.__getattribute__(item)
-            if isinstance(attr, type(self.__init__)):
-                return process_response(get_payload(attr))
-            else:
-                return attr
+            def __getattribute__(self, item):
+                try:
+                    x = super().__getattribute__(item)
+                except:
+                    pass
+                else:
+                    return x
+                attr = self._obj.__getattribute__(item)
+                if isinstance(attr, type(self.__init__)):
+                    return process_response(get_payload(attr))
+                else:
+                    return attr
 
-    return Cls
+        return Cls
+    return wrapper
 
 
 

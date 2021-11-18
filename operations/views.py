@@ -7,8 +7,8 @@ from .models import Operation, CategoryToUser
 from .serializers import OperationSerializer, CategorySerializer
 
 
-@all_methods_get_payload
-class OperationViewSet(viewsets.ViewSet):
+@all_methods_get_payload(viewsets.ViewSet)
+class OperationViewSet:
     @get_user_id_from_payload
     def list(self, request, *args, **kwargs):
         operations = Operation.objects.filter(category__user_id=kwargs['user_id']).all()
@@ -51,8 +51,8 @@ class OperationViewSet(viewsets.ViewSet):
         return serializer.data, status.HTTP_200_OK
 
 
-@all_methods_get_payload
-class CategoryListView(viewsets.ViewSet):
+@all_methods_get_payload(viewsets.ViewSet)
+class CategoryListView:
     @get_user_id_from_payload
     def list(self, request, *args, **kwargs):
         categories = CategoryToUser.objects.filter(user_id=kwargs['user_id'])
@@ -60,20 +60,12 @@ class CategoryListView(viewsets.ViewSet):
         return serializer.data, status.HTTP_200_OK
 
 
-@all_methods_get_payload
-class CategoryView(viewsets.ViewSet):
+@all_methods_get_payload(viewsets.ViewSet)
+class CategoryView:
     @get_user_id_from_payload
     def create(self, request, *args, **kwargs):
         isIncome = request.data.get('isIncome', True)
-        if isIncome == 'true':
-            isIncome = True
-        elif isIncome == 'false':
-            isIncome = False
-        else:
-            return "Not valid param 'isIncome'", status.HTTP_400_BAD_REQUEST
-
-        print(request.data)
-        print({"name": request.data.get("name", ""), "isIncome": isIncome, "user_id": kwargs['user_id']})
+        
         serializer = CategorySerializer(data={"name": request.data.get("name", ""), "isIncome": isIncome, "user_id": kwargs['user_id']})
         if serializer.is_valid(raise_exception=False):
             serializer.save(user_id=kwargs['user_id'])

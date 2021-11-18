@@ -6,8 +6,8 @@ from .serializers import BillSerializer
 from utils import all_methods_get_payload, get_bill, get_user_id_from_payload
 
 
-@all_methods_get_payload
-class BillViewSet(viewsets.ViewSet):
+@all_methods_get_payload(viewsets.ViewSet)
+class BillViewSet:
 
     @get_user_id_from_payload
     def list(self, request, **kwargs):
