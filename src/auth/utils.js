@@ -25,8 +25,8 @@ export async function register(body){
 
 export async function get_user(){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/api/user`, {
-                headers: {"jwt-assertion": localStorage.getItem('access_token')},
-            });
+        headers: {"jwt-assertion": localStorage.getItem('access_token')},
+    });
     return response;
 }
 

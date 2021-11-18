@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -12,6 +12,8 @@ import TabPanel from '@mui/lab/TabPanel';
 import Tab from '@mui/material/Tab';
 
 import ChooseCategoryModal from './ChooseCategoryModal';
+
+import {category_list} from '../utils'
 
 
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, ref) {
@@ -46,13 +48,16 @@ export default function AddOperation(props) {
     const [navValue, setNavValue] = useState('1');
     const [isIncome, setIsIncome] = React.useState(true);
     const [value, setValue] = React.useState(0);
-    const [category, setCategory] = React.useState('');
+    const [category, setCategory] = React.useState(undefined);
+    const [categoryList, setCategoryList] = React.useState(undefined);
     const [bank, setBank] = React.useState(undefined);
     const [date, setDate] = React.useState(new Date());
     const [description, setDescription] = React.useState('');
     const [error, setError] = React.useState('');
 
     const [openChooseCategoryModal, setChooseCategoryModal] = React.useState(false);
+
+    const [isSendRequest, setIsSendRequest] = useState(false);
     
     const submit = () => {
 
@@ -60,6 +65,28 @@ export default function AddOperation(props) {
     const handleChange = (event, newValue) => {
         setNavValue(newValue);
     };
+
+    // TODO: Fix all time requests
+    useEffect(() => {
+        (
+            async () => {
+                if(localStorage.getItem('access_token') !== null){
+                    if(categoryList === undefined && isSendRequest === false){
+                        const response = await category_list();
+                    
+                        if(response.status === 200){
+                            const content = await response.json();
+                            setCategoryList(content.map((category) => category));
+                        }
+                        setIsSendRequest(true);
+                    }
+                    
+                    
+                }
+            }
+        )();
+    });
+
     const AddForm = <form>
                         <Box sx={{ '& button': { m: 1 } }}>
                             <h1 className="h3 m-5 mt-0 fw-normal">Add operation</h1>
@@ -80,12 +107,12 @@ export default function AddOperation(props) {
                                 <TextField
                                     id="standard-required"
                                     label="Category"
-                                    defaultValue={category}
+                                    defaultValue={category !== undefined && category.isIncome === isIncome? category.name : null}
                                     variant="standard"
                                     // onChange={e => setCategory(e.target.value)}
                                     onClick={e => {setChooseCategoryModal(true)}}
                                 />
-                                <ChooseCategoryModal openModal={openChooseCategoryModal} setOpen={setChooseCategoryModal} setCategory={setCategory} isIncome={isIncome}/>
+                                <ChooseCategoryModal openModal={openChooseCategoryModal} setOpen={setChooseCategoryModal} categoryList={categoryList} setCategory={setCategory} isIncome={isIncome}/>
                             </div>
                             {/* //TODO: Change on select */}
                             <div className="m-5">
@@ -137,8 +164,12 @@ export default function AddOperation(props) {
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <TabList onChange={handleChange} aria-label="lab API tabs example">
                 {/* icon={} */}
-                    <Tab label="PAYMENT" value="1" onClick={e => setIsIncome(false)}/> 
-                    <Tab label="INCOME" value="2" onClick={e => setIsIncome(true)}/>
+                    <Tab label="PAYMENT" value="1" onClick={e => {
+                        setIsIncome(false);
+                        }}/> 
+                    <Tab label="INCOME" value="2" onClick={e => {
+                        setIsIncome(true);
+                    }}/>
                     <Tab label="TRANSFER" value="3"/>
                 </TabList>
             </Box>

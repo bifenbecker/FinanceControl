@@ -38,15 +38,24 @@ export async function bill_list(){
 }
 
 export async function category_list(){
-    try{
-        const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/categories`, {
-            headers: {
-                "jwt-assertion": localStorage.getItem('access_token'),
-            }
-        })
-        return response;
-    }
-    catch{
-        window.location.reload();
-    }
+    const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/categories`, {
+        headers: {
+            "jwt-assertion": localStorage.getItem('access_token'),
+        }
+    })
+
+    return response;
+}
+
+export async function create_category(body){
+    const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/category`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'jwt-assertion': localStorage.getItem('access_token')
+                },
+                credentials: 'include',
+                body: body
+            });
+    return response;
 }
