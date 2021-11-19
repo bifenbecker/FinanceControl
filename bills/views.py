@@ -15,8 +15,8 @@ class BillViewSet:
         List banks
         """
 
-        user_banks = Bill.objects.filter(user_id=kwargs['user_id']).all()
-        serializer = BillSerializer(user_banks, many=True)
+        user_bills = Bill.objects.filter(user_id=kwargs['user_id']).all()
+        serializer = BillSerializer(user_bills, many=True)
         return serializer.data, status.HTTP_200_OK
 
     @get_bill
@@ -24,7 +24,7 @@ class BillViewSet:
         """
         Get bank
         """
-        serializer = BillSerializer(kwargs['bank'])
+        serializer = BillSerializer(kwargs['bill'])
         return serializer.data, status.HTTP_200_OK
 
     @get_bill
@@ -32,11 +32,11 @@ class BillViewSet:
         """
         Update bank
         """
-        new_bank_data = request.data
-        new_bank_data['user_id'] = kwargs['user_id']
-        bank = kwargs['bill']
-        serializer = BillSerializer(instance=bank)
-        serializer.update(bank, new_bank_data)
+        new_bill_data = request.data
+        new_bill_data['user_id'] = kwargs['user_id']
+        bill = kwargs['bill']
+        serializer = BillSerializer(instance=bill)
+        serializer.update(bill, new_bill_data)
         return serializer.data, status.HTTP_202_ACCEPTED
 
     @get_bill
@@ -44,8 +44,8 @@ class BillViewSet:
         """
         Delete bank
         """
-        bank = kwargs['bill']
-        bank.delete()
+        bill = kwargs['bill']
+        bill.delete()
         return {'msg': 'Bill was deleted'}, status.HTTP_202_ACCEPTED
 
     @get_user_id_from_payload
@@ -53,10 +53,12 @@ class BillViewSet:
         """
         Create bank
         """
-        bank_data = request.data
-        bank_data.update({'user_id': kwargs['user_id']})
-        serialiser = BillSerializer(data=bank_data)
+        bill_data = request.data
+        bill_data.update({'user_id': kwargs['user_id']})
+        serialiser = BillSerializer(data=bill_data)
         serialiser.is_valid(raise_exception=True)
         serialiser.save()
         return serialiser.data, status.HTTP_202_ACCEPTED
+
+
 

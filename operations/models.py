@@ -22,7 +22,7 @@ class Operation(models.Model):
 
 
 class OperationToBill(models.Model):
-    operation = models.OneToOneField(Operation, on_delete=models.CASCADE, related_name='to_bank',
+    operation = models.OneToOneField(Operation, on_delete=models.CASCADE, related_name='to_bill',
                                      verbose_name="Operation",
                                      blank=False)
     bill = models.ForeignKey('bills.Bill', on_delete=models.PROTECT, related_name='operations',

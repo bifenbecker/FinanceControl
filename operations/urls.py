@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import OperationViewSet, CategoryView, CategoryListView
+from .views import OperationViewSet, CategoryView, CategoryListView, ListOperationsOfBill
 
 
 urlpatterns = [
@@ -13,6 +13,7 @@ urlpatterns = [
     path('operations', OperationViewSet.as_view({
         'get': 'list'
     })),
+    path('operations-of-bill', ListOperationsOfBill.as_view()),
     path('categories', CategoryListView.as_view({
         'get': 'list'
     })),

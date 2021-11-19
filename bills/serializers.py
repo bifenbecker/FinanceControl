@@ -6,7 +6,7 @@ from .models import Bill
 class BillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bill
-        fields = ('uuid', 'user_id', 'name', 'balance')
+        fields = ('uuid', 'user_id', 'name', 'balance')  # todo: Delete user_id field
 
 
     def update(self, instance, validated_data):
@@ -32,6 +32,8 @@ class BillSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_id = validated_data.get('user_id')
         name = validated_data.get('name')
+        validated_data.update({'start_balance': validated_data.get('balance')})
+
 
         if len(Bill.objects.filter(user_id=user_id, name=name)) >= 1:
             raise serializers.ValidationError('Name must be unique')

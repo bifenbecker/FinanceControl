@@ -124,9 +124,11 @@ def get_bill(func):
     """
 
     def wrapper(self, request, *args, **kwargs):
-        try:
-            bill_uuid = request.data.pop('uuid')
-        except:
+        if 'uuid' in request.data.keys():
+            bill_uuid = request.data.pop('uuid')  # todo: check pop in data
+        elif 'uuid' in request.headers.keys():
+            bill_uuid = request.headers.get('uuid')
+        else:
             return {'msg': 'No bill uuid'}, status.HTTP_400_BAD_REQUEST
 
         try:
