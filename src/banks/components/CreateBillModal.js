@@ -29,7 +29,7 @@ const CreateBillModal = (props) => {
             aria-describedby="modal-modal-description"
         >
             <Box sx={style}>
-            <CreateBill />
+            <CreateBill setOpen={props.setOpen}/>
             </Box>
         </Modal>
         </div>

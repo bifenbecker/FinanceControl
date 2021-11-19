@@ -72,6 +72,7 @@ const CreateBill = (props) => {
                 name,
                 balance
             })
+            props.setOpen(false);
             if(response.status === 200 || response.status === 202){
                 setError('');
             }

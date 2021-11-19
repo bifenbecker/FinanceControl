@@ -21,10 +21,12 @@ import ListBills from '../../banks/pages/ListBills';
 import ProfileMenu from './ProfileMenu';
 import BillsMenu from '../../banks/components/BillsMenu';
 import OperationsMenu from '../../banks/components/OperationsMenu';
+import BillView from '../../banks/pages/BillView';
 
 
 const Nav = (props) => {
     const [value, setNavValue] = useState('1');
+    const [activeBill, setActiveBill] = useState(undefined);
 
     const logout = () => {
         localStorage.removeItem('access_token');
@@ -64,7 +66,8 @@ const Nav = (props) => {
             <TabPanel value="1">Home</TabPanel>
             <TabPanel value="2"><Login setNavValue={setNavValue} setUser={props.setUser}/></TabPanel>
             <TabPanel value="3"><Register setNavValue={setNavValue}/></TabPanel>
-            <TabPanel value="4"><ListBills /></TabPanel>
+            <TabPanel value="4"><ListBills setValue={setNavValue} setActiveBill={setActiveBill}/></TabPanel>
+            <TabPanel value="5"><BillView bill={activeBill} setNavValue={setNavValue}/></TabPanel>
         </TabContext>
     );
 };

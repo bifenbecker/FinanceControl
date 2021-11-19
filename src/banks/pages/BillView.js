@@ -19,10 +19,14 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 
 import EditBill from '../components/EditBill';
+import ListOperationsOfBill from './ListOperationsOfBill';
+import AddOperationModal from '../components/AddOperationModal';
+
 
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
+    
 
     return (
         <Typography
@@ -66,9 +70,17 @@ const fabGreenStyle = {
 };
 
 
-const Bill = (props) => {
+const BillView = (props) => {
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
+    const [openAddOperationModal, setAddOperationModal] = React.useState(false);
+
+    const handleClose = (e) => {
+        setAddOperationModal(false);
+    }
+    const addOperationModal = () => {
+        setAddOperationModal(true);
+    }
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -83,9 +95,7 @@ const Bill = (props) => {
         exit: theme.transitions.duration.leavingScreen,
     };
 
-    const addOperation = () => {
-        props.setNavValue('6');
-    }
+    
 
     const editBank = () => {
         console.log(2);
@@ -97,7 +107,7 @@ const Bill = (props) => {
             sx: fabStyle,
             icon: <AddIcon />,
             label: 'Add operation',
-            onClick: addOperation,
+            onClick: addOperationModal,
         },
         {
             color: 'secondary',
@@ -110,6 +120,7 @@ const Bill = (props) => {
 
     return (
         <div>
+            <AddOperationModal openModal={openAddOperationModal} setOpen={setAddOperationModal} handleClose={handleClose} bill={props.bill} setNavValue={props.setNavValue}/>
             <ThemeProvider theme={theme}>
                 <Box
                     sx={{
@@ -120,10 +131,10 @@ const Bill = (props) => {
                     }}
                 >
                     <Box sx={{ color: 'text.secondary', fontSize: 25, fontWeight: 'medium' }}>
-                        {props.bank.name}
+                        {props.bill.name}
                     </Box>
                     <Box sx={{ color: 'text.primary', fontSize: 22 }}>
-                    Balance: {props.bank.balance}
+                    Balance: {props.bill.balance}
                     </Box>
                     
                 </Box>
@@ -155,8 +166,8 @@ const Bill = (props) => {
                         variant="fullWidth"
                         aria-label="action tabs example"
                         >
-                        <Tab label="My operations" {...a11yProps(0)} />
-                        <Tab label="Edit bank" {...a11yProps(1)} />
+                        <Tab label="Operations" {...a11yProps(0)} />
+                        <Tab label="Edit bill" {...a11yProps(1)} />
                         </Tabs>
                     </AppBar>
                     <SwipeableViews
@@ -165,10 +176,11 @@ const Bill = (props) => {
                         onChangeIndex={handleChangeIndex}
                     >
                         <TabPanel value={value} index={0} dir={theme.direction}>
-                            List of operations
+                            <ListOperationsOfBill bill={props.bill} />
+                            
                         </TabPanel>
                         <TabPanel value={value} index={1} dir={theme.direction}>
-                            <EditBill bank={props.bank}/>
+                            <EditBill bill={props.bill}/>
                         </TabPanel>
                     </SwipeableViews>
                     {fabs.map((fab, index) => (
@@ -193,4 +205,4 @@ const Bill = (props) => {
     );
 }
 
-export default Bill;
+export default BillView;

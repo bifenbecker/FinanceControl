@@ -12,8 +12,9 @@ import TabPanel from '@mui/lab/TabPanel';
 import Tab from '@mui/material/Tab';
 
 import ChooseCategoryModal from './ChooseCategoryModal';
+import ChooseBillModal from './ChooseBillModal';
 
-import {category_list} from '../utils'
+import {category_list, bill_list, add_operation} from '../utils'
 
 
 const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, ref) {
@@ -46,21 +47,38 @@ const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, r
 
 export default function AddOperation(props) {
     const [navValue, setNavValue] = useState('1');
-    const [isIncome, setIsIncome] = React.useState(true);
-    const [value, setValue] = React.useState(0);
+    const [isIncome, setIsIncome] = React.useState(false);
+    const [value, setValue] = React.useState(0.0);
     const [category, setCategory] = React.useState(undefined);
     const [categoryList, setCategoryList] = React.useState(undefined);
-    const [bank, setBank] = React.useState(undefined);
+    const [billList, setBillList] = React.useState(undefined);
+    const [bill, setBill] = React.useState(props.bill);
     const [date, setDate] = React.useState(new Date());
     const [description, setDescription] = React.useState('');
     const [error, setError] = React.useState('');
 
     const [openChooseCategoryModal, setChooseCategoryModal] = React.useState(false);
+    const [openChooseBillModal, setChooseBillModal] = React.useState(false);
 
     const [isSendRequest, setIsSendRequest] = useState(false);
     
-    const submit = () => {
-
+    const submit = async () => {
+        console.log({
+            category,
+            description,
+            value,
+            isIncome,
+            bill
+        })
+        const response = await add_operation({
+            category: category.id,
+            description,
+            value,
+            isIncome,
+        }, bill.uuid);
+        const content = await response.json();
+        props.setNavValue('5')
+        props.handleClose();
     }
     const handleChange = (event, newValue) => {
         setNavValue(newValue);
@@ -71,12 +89,18 @@ export default function AddOperation(props) {
         (
             async () => {
                 if(localStorage.getItem('access_token') !== null){
-                    if(categoryList === undefined && isSendRequest === false){
-                        const response = await category_list();
+                    if(categoryList === undefined && billList === undefined && isSendRequest === false){
+                        let response = await category_list();
                     
                         if(response.status === 200){
                             const content = await response.json();
                             setCategoryList(content.map((category) => category));
+                        }
+                        response = await bill_list();
+                    
+                        if(response.status === 200){
+                            const content = await response.json();
+                            setBillList(content.map((bill) => bill));
                         }
                         setIsSendRequest(true);
                     }
@@ -93,6 +117,7 @@ export default function AddOperation(props) {
                             <div className="m-5">
                                 <TextField
                                     label={isIncome? `+${value}`: `-${value}`}
+                                    defaultValue={value}
                                     onChange={e => setValue(e.target.value)}
                                     name={isIncome? "income":"payment"}
                                     id="formatted-numberformat-input"
@@ -106,8 +131,9 @@ export default function AddOperation(props) {
                             <div className="m-5">
                                 <TextField
                                     id="standard-required"
-                                    label="Category"
-                                    defaultValue={category !== undefined && category.isIncome === isIncome? category.name : null}
+                                    label={category !== undefined? null : "Category"}
+                                    value={category !== undefined && category.isIncome === isIncome? category.name + " - Category" : null}
+                                    defaultValue="Category"
                                     variant="standard"
                                     // onChange={e => setCategory(e.target.value)}
                                     onClick={e => {setChooseCategoryModal(true)}}
@@ -118,11 +144,13 @@ export default function AddOperation(props) {
                             <div className="m-5">
                                 <TextField
                                     id="standard-required"
-                                    label="Bank"
-                                    defaultValue={bank}
+                                    label={bill !== undefined ? null : "Bill"}
+                                    value={bill !== undefined ? bill.name + " - Bill" : null}
+                                    defaultValue="Bill"
                                     variant="standard"
-                                    onChange={e => setBank(e.target.value)}
+                                    onClick={e => {setChooseBillModal(true)}}
                                 />
+                                <ChooseBillModal openModal={openChooseBillModal} setOpen={setChooseBillModal} billList={billList} setBill={setBill}/>
                             </div>
                             {/* //TODO: Change on date */}
                             <div className="m-5">
@@ -131,10 +159,11 @@ export default function AddOperation(props) {
                                 label="Date"
                                 type="date"
                                 defaultValue={date}
-                                sx={{ width: 220 }}
+                                sx={{ width: '100%' }}
                                 InputLabelProps={{
                                     shrink: true,
                                 }}
+                                onChange={e => setDate(e.target.value)}
                             />
                             </div>
                             <div className="m-5">

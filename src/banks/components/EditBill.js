@@ -45,7 +45,7 @@ export default function EditBill(props) {
                     <TextField
                         id="standard-required"
                         label="Name"
-                        defaultValue={props.bank.name}
+                        defaultValue={props.bill.name}
                         variant="standard"
                         onChange={e => setNewName(e.target.value)}
                     />
@@ -54,7 +54,7 @@ export default function EditBill(props) {
                 <div className="m-5">
                     <TextField
                         label="Balance"
-                        defaultValue={props.bank.balance}
+                        defaultValue={props.bill.balance}
                         onChange={e => setNewBalance(e.target.value)}
                         name="numberformat"
                         id="formatted-numberformat-input"

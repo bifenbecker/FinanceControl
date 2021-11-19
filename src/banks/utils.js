@@ -58,3 +58,41 @@ export async function create_category(body){
             });
     return response;
 }
+
+export async function add_operation(body, uuid){
+    const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/operation`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'jwt-assertion': localStorage.getItem('access_token'),
+                    'uuid': uuid
+                },
+                body: JSON.stringify(body)
+            });
+    return response;
+}
+
+
+export async function edit_operation(body){
+    const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/operation`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'jwt-assertion': localStorage.getItem('access_token'),
+                },
+                body: JSON.stringify(body)
+            });
+    return response;
+}
+
+
+export async function operations_of_bill(uuid){
+    const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/operations-of-bill`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'jwt-assertion': localStorage.getItem('access_token'),
+                    'uuid': uuid
+                }
+            });
+    return response;
+}

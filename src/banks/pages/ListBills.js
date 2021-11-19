@@ -29,8 +29,8 @@ const BillPrev = (props) => {
     });
 
     const select = () => {
-        props.setActiveBank(props.bank);
-        props.setValue("3");
+        props.setActiveBill(props.bill);
+        props.setValue("5");
     }
 
     return (
@@ -48,10 +48,10 @@ const BillPrev = (props) => {
                     <Box sx={{ color: 'text.secondary', fontSize: 25, fontWeight: 'medium' }}
                         onClick={select}
                     >
-                        {props.bank.name}
+                        {props.bill.name}
                     </Box>
                     <Box sx={{ color: 'text.primary', fontSize: 22 }}>
-                    {props.bank.balance}
+                    {props.bill.balance}
                     </Box>
                     <Box
                     sx={{
@@ -71,7 +71,7 @@ const BillPrev = (props) => {
 
 
 const ListBills = (props) => {
-    const [bankList, setBankList] = useState(undefined);
+    const [billList, setBillList] = useState(undefined);
 
     useEffect(() => {
         (
@@ -82,7 +82,7 @@ const ListBills = (props) => {
                     window.location.reload();
                 }
                 else if(response.status === 200){
-                    setBankList(content.map((bank) => <BillPrev bank={bank} setValue={props.setValue} setActiveBank={props.setActiveBank}/>));
+                    setBillList(content.map((bill) => <BillPrev bill={bill} setValue={props.setValue} setActiveBill={props.setActiveBill}/>));
                 } 
             }
         )();
@@ -93,7 +93,7 @@ const ListBills = (props) => {
             <Box sx={{ color: 'text.primary', fontSize: 28, fontWeight: 'medium' }}>
                 My bills
             </Box>
-            {bankList}
+            {billList}
         </div>
     );
 }
