@@ -10,14 +10,11 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class OperationSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
-
-    def create(self, validated_data):
-        print(validated_data)
-        print(validated_data['category'][0]['id'])
-        data = {'category': validated_data['category'][0]}
-
+    category = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name'
+    )
 
     class Meta:
         model = Operation
-        fields = '__all__'
+        fields = ['uuid', 'description', 'date', 'isIncome', 'value', 'category']
