@@ -24,8 +24,9 @@ def verify_access_token(token: str) -> Union[dict, None]:
     if not token:
         raise Exception("No token")
 
-    key = jwk.JWK(**settings.JWKS)
     try:
+        key = settings.KEY
+        # key = jwk.JWK(**settings.KEY)
         ET = jwt.JWT(key=key, jwt=token)
     except jwt.JWTExpired:
         raise Exception("Token expired")
@@ -47,8 +48,8 @@ def gen_pair_tokens(user):
 
     payload_for_access_token = {
         'id': user.id,
-        'exp': int(time.time()) + int(datetime.timedelta(minutes=10).seconds),
-        'iat': time.time(),
+        'exp': int(time.time()) + int(settings.JWT["ACCESS_TOKEN_LIFETIME"].seconds),
+        'iat': int(time.time()),
         'iss': settings.ISSUER,
         'aud': settings.AUDIENCES
     }
@@ -56,9 +57,10 @@ def gen_pair_tokens(user):
     refresh_token = hashlib.md5(
         f'{user.id}{generate_random_string(settings.JWT["LENGTH_STRING_REFRESH_HASH"])}'.encode()).hexdigest()
 
-    key = jwk.JWK(**settings.JWKS)
-    token = jwt.JWT(header={"alg": "HS256"}, claims=payload_for_access_token)
+    token = jwt.JWT(header={"alg": settings.JWT["ALGORITHM"], "type": "JWT"}, claims=payload_for_access_token)
 
+    key = settings.KEY
+    # key = jwk.JWK(**settings.KEY)
     token.make_signed_token(key)
     access_token = token.serialize()
 
@@ -159,7 +161,7 @@ def check_token(func):
         try:
             access_token = request.headers.get('jwt-assertion')
         except:
-            return "No token", status.HTTP_400_BAD_REQUEST
+            return {'msg': "No token"}, status.HTTP_400_BAD_REQUEST
 
         try:
             claims = verify_access_token(access_token)
@@ -167,12 +169,12 @@ def check_token(func):
             user, status_code = verify_user(claims['id'])
             if status_code in [200, 423]:
                 kwargs.update({'user': user})
-                res = func(request, *args, **kwargs)
-                return res
+                res, code = func(request, *args, **kwargs)
+                return res, code
             else:
-                return {}, status_code
+                return {'msg': "Error"}, status_code
         except Exception as e:
-            return str(e), status.HTTP_400_BAD_REQUEST
+            return {'msg': str(e)}, status.HTTP_400_BAD_REQUEST
 
     return wrapper
 
@@ -197,7 +199,7 @@ def all_methods_check_token(cls):
                 return x
             attr = self._obj.__getattribute__(item)
             if isinstance(attr, type(self.__init__)):
-                return check_token(process_response(attr))
+                return process_response(check_token(attr))
             else:
                 return attr
 

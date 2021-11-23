@@ -98,8 +98,9 @@ class LoginView(APIView):
 
 
 def json_token(request):
+    # key = jwk.JWK.generate(kty='RSA', size=2048, kid=settings.SECRET_KEY)
     data = {
-        "keys": [settings.JWKS]
+        "keys": [settings.KEY.export_public(as_dict=True)]
     }
     return HttpResponse(json.dumps(data))
 

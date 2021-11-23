@@ -9,10 +9,12 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-import environ
 import os
 from datetime import timedelta
 from pathlib import Path
+
+import environ
+from jwcrypto import jwk
 
 env = environ.Env()
 
@@ -152,23 +154,25 @@ CORS_ALLOW_CREDENTIALS = True
 
 # region JWT SETTINGS
 JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # todo: Change value lifetime
     'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
-    'ALGORITHM': 'HS256',
+    'ALGORITHM': 'RS256',
     'SIGNING_KEY_ACCESS': SECRET_KEY + "_access",
     'LENGTH_STRING_REFRESH_HASH': 10
 }
 
 ISSUER = 'auth_cluster'
 AUDIENCES = [
-    'banks'
+    'bankAccounts'
 ]
 
-JWKS = {
-    "k": SECRET_KEY,
-    "kid": SECRET_KEY,
-    "kty": "oct"
-}
+KEY = jwk.JWK.generate(kty='RSA', size=2048, kid=SECRET_KEY)
+# KEY = {
+#     "kty": "RSA",
+#     "kid": "secret",
+#     "n": "o1g_fECe5ZxHGgzl8b9qUMIZyv2biUtvfqvWC-E9BwVf3SDRJ7ExRjMgavNyuRhs0YWYw94Z3NBO5BLQ7NU5y3PhVretzqaqUFoV98hcoP0apU-ZFZOzdUpkEUA7RtvehzZSqfKZSPOCZ0A0pP3u1DxGoL1aB5N-pK0lo4FBI-KCanptprKQUMscD66gxTzYTVNqFhoNxozsEmDCbIYxHrJ0g7ercEb2ewondQ46miGOtjfQFEZU3YWLDQ3h1fTyLsTVyBveRGlk9036Auv1r89gJ7X1xlcmYiGIelwbvvjjgi97lzcQv-mc516nZKGFwdeqsfFoYtecdRR6BWfg1w",
+#     "e": "AQAB"
+# }
 # endregion
 
 
