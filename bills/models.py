@@ -4,7 +4,7 @@ from typing import Optional, Union
 from django.db import models
 
 from operations.models import Operation, OperationToBill, CategoryToUser
-from operations.serializers import OperationSerializer, CategorySerializer
+from operations.serializers import OperationSerializer
 
 
 class Bill(models.Model):
@@ -43,17 +43,15 @@ class Bill(models.Model):
         if not Category:
             raise Exception("No such category")
 
-        serializer_category = CategorySerializer(instance=Category)
         serializer_operation = OperationSerializer(data={
             'user_id': self.user_id,
-            'category': serializer_category.data,
             'description': description,
             'isIncome': isIncome,
             'value': value
         })
         serializer_operation.is_valid(raise_exception=True)
         if serializer_operation.is_valid():
-            operation = serializer_operation.save()
+            operation = serializer_operation.save(category=Category)
             operation_to_bill = OperationToBill.objects.create(
                 operation=operation,
                 bill=self

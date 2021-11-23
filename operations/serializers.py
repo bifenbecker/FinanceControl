@@ -18,3 +18,13 @@ class OperationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operation
         fields = ['uuid', 'description', 'date', 'isIncome', 'value', 'category']
+
+    def to_representation(self, instance):
+        ret = super(OperationSerializer, self).to_representation(instance=instance)
+        bill = instance.to_bill.bill
+        ret.update({'bill': {
+            'name': bill.name,
+            'balance': bill.balance
+        }})
+        return ret
+
