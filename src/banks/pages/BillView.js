@@ -9,6 +9,7 @@ import { useTheme } from '@mui/material/styles';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import DownloadIcon from '@mui/icons-material/Download';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Zoom from '@mui/material/Zoom';
@@ -18,9 +19,21 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
 import EditBill from '../components/EditBill';
-import ListOperationsOfBill from './ListOperationsOfBill';
 import AddOperationModal from '../components/AddOperationModal';
+
+import { operations_of_bill } from '../utils';
+import ListOperations from '../components/ListOperations';
+import StatisticOfOperations from '../components/StatisticOfOperations';
+
 
 
 
@@ -69,8 +82,34 @@ const fabGreenStyle = {
     },
 };
 
+function get_stat(operations) {
+    var income = 0;
+    var payment = 0;
+    console.log(operations)
+    for (var i = 0; i < operations.length; i++) {
+        if(operations[i].isIncome === true) {
+            try{
+                income += Number(operations[i].value);
+            }
+            catch{
+                continue;
+            }
+        }
+        else{
+            try{
+                payment += Number(operations[i].value);
+            }
+            catch{
+                continue;
+            }
+            
+        }
+    }
+    return [income, payment];
+}
 
 const BillView = (props) => {
+    
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
     const [openAddOperationModal, setAddOperationModal] = React.useState(false);
@@ -95,9 +134,28 @@ const BillView = (props) => {
         exit: theme.transitions.duration.leavingScreen,
     };
 
+    const [operations, setOperations] = useState(undefined);
+    const [incomeValue, setIncomeValue] = useState(undefined);
+    const [paymentValue, setPaymentValue] = useState(undefined);
+    useEffect(() => {
+        (
+            async () => {
+                const response = await operations_of_bill(props.bill.uuid);
+                const content = await response.json();
+                setOperations(content.map((operation) => {
+                    return operation
+                }))
+                setIncomeValue(content.filter((value) => value.isIncome === true).map((operation) => Number(operation.value)).reduce((acc, value) => acc + value));
+                setPaymentValue(content.filter((value) => value.isIncome === false).map((operation) => Number(operation.value)).reduce((acc, value) => acc + value));
+            }
+        )();
+    }, []);
     
 
     const editBank = () => {
+        console.log(2);
+    }
+    const downloadStatistic = () => {
         console.log(2);
     }
 
@@ -108,6 +166,13 @@ const BillView = (props) => {
             icon: <AddIcon />,
             label: 'Add operation',
             onClick: addOperationModal,
+        },
+        {
+            color: 'primary',
+            sx: fabStyle,
+            icon: <DownloadIcon />,
+            label: 'Download statistic',
+            onClick: downloadStatistic,
         },
         {
             color: 'secondary',
@@ -136,8 +201,26 @@ const BillView = (props) => {
                     <Box sx={{ color: 'text.primary', fontSize: 22 }}>
                     Balance: {props.bill.balance}
                     </Box>
-                    
+                    <TableContainer>
+                        <Table sx={{ width: '100%' }} aria-label="simple table">
+                        <TableHead>
+                            <TableRow>
+                            <TableCell>INCOME</TableCell>
+                            <TableCell>PAYMENT</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            <TableRow
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                            >
+                                <TableCell>{incomeValue}</TableCell>
+                                <TableCell>{paymentValue}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                        </Table>
+                    </TableContainer>
                 </Box>
+                
             </ThemeProvider>
             <Box
                 sx={{
@@ -152,7 +235,7 @@ const BillView = (props) => {
                 <Box
                     sx={{
                         bgcolor: 'background.paper',
-                        width: 500,
+                        width: '40%',
                         position: 'relative',
                         minHeight: 200,
                     }}
@@ -166,8 +249,10 @@ const BillView = (props) => {
                         variant="fullWidth"
                         aria-label="action tabs example"
                         >
+                        
                         <Tab label="Operations" {...a11yProps(0)} />
-                        <Tab label="Edit bill" {...a11yProps(1)} />
+                        <Tab label="Statistic" {...a11yProps(1)} />
+                        <Tab label="Edit bill" {...a11yProps(2)} />
                         </Tabs>
                     </AppBar>
                     <SwipeableViews
@@ -175,11 +260,18 @@ const BillView = (props) => {
                         index={value}
                         onChangeIndex={handleChangeIndex}
                     >
-                        <TabPanel value={value} index={0} dir={theme.direction}>
-                            <ListOperationsOfBill bill={props.bill} />
-                            
+                        
+                        <TabPanel
+                            value={value} index={0} dir={theme.direction}
+                        >
+                            <ListOperations operations={operations} />
                         </TabPanel>
-                        <TabPanel value={value} index={1} dir={theme.direction}>
+                        <TabPanel
+                            value={value} index={1} dir={theme.direction}
+                        >
+                            <StatisticOfOperations operations={operations} />
+                        </TabPanel>
+                        <TabPanel value={value} index={2} dir={theme.direction}>
                             <EditBill bill={props.bill}/>
                         </TabPanel>
                     </SwipeableViews>

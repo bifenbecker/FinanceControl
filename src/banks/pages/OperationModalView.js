@@ -68,10 +68,6 @@ const OperationModalView = (props) => {
         const content = await response.json();
     }
 
-    // if(value !== props.operation.value || date !== props.operation.date || description !== props.operation.description){
-    //     setIsVisible(true);
-    // }
-
     const OperationForm = <form>
                         <Box sx={{ '& button': { m: 1 } }} >
                             <h1 className="h3 m-5 mt-0 fw-normal">Operation</h1>
@@ -104,7 +100,7 @@ const OperationModalView = (props) => {
                                     disabled
                                     id="standard-required"
                                     label="Bill"
-                                    defaultValue={props.bill.name}
+                                    defaultValue={props.operation.bill? props.operation.bill.name:null}
                                     variant="standard"
                                 />
                             </div>

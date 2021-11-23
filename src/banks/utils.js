@@ -96,3 +96,12 @@ export async function operations_of_bill(uuid){
             });
     return response;
 }
+
+export async function my_operations(){
+    const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/operations`, {
+                headers: {
+                    'jwt-assertion': localStorage.getItem('access_token'),
+                }
+            });
+    return response;
+}

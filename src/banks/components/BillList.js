@@ -9,6 +9,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 
 
 const BillList = (props) => {
+    // In modal view
 
     const handleListItemClick = (event, bill) => {
         props.setBill(bill);

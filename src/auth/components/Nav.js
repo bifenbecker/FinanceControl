@@ -22,6 +22,7 @@ import ProfileMenu from './ProfileMenu';
 import BillsMenu from '../../banks/components/BillsMenu';
 import OperationsMenu from '../../banks/components/OperationsMenu';
 import BillView from '../../banks/pages/BillView';
+import MyOperations from '../../banks/pages/MyOperations';
 
 
 const Nav = (props) => {
@@ -68,6 +69,7 @@ const Nav = (props) => {
             <TabPanel value="3"><Register setNavValue={setNavValue}/></TabPanel>
             <TabPanel value="4"><ListBills setValue={setNavValue} setActiveBill={setActiveBill}/></TabPanel>
             <TabPanel value="5"><BillView bill={activeBill} setNavValue={setNavValue}/></TabPanel>
+            <TabPanel value="6"><MyOperations /></TabPanel>
         </TabContext>
     );
 };
