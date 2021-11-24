@@ -2,7 +2,7 @@ from django.urls import path
 from .views import BillViewSet
 
 urlpatterns = [
-    path('bank', BillViewSet.as_view({
+    path('bill', BillViewSet.as_view({
         'post': 'retrieve',
         'put': 'update',
         'delete': 'destroy'

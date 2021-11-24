@@ -26,7 +26,7 @@ class Bill(models.Model):
         self.save()
         return self.balance
 
-    def add_operation(self, category: Optional[int], description: Optional[str] = "",
+    def add_operation(self, category: Union[int, None], description: Optional[str] = "",
                       value: Optional[float] = 0.0, isIncome: Optional[bool] = True) -> Optional[Operation]:
         """
             Valiadte data and create operation
@@ -38,10 +38,12 @@ class Bill(models.Model):
             :param isIncome:
             :return: Operation
             """
-        Category = CategoryToUser.objects.filter(id=category).first()
-
-        if not Category:
-            raise Exception("No such category")
+        if category:
+            Category = CategoryToUser.objects.filter(id=category).first()
+            if not Category:
+                raise Exception("No such category")
+        else:
+            Category = None
 
         serializer_operation = OperationSerializer(data={
             'user_id': self.user_id,
