@@ -123,8 +123,8 @@ const CreateBill = (props) => {
                 </div>
                 
             </Box>
-            <div class="row">
-                <div class="col text-center">
+            <div className="row">
+                <div className="col text-center">
                 <Button variant="outlined" onClick={submit}>CREATE</Button>
                 <p className="mt-5">
                     {error !== ''? error: ''}

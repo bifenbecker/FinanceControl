@@ -66,6 +66,7 @@ const OperationModalView = (props) => {
             description
         });
         const content = await response.json();
+        props.setOperation(content);
     }
 
     const OperationForm = <form>

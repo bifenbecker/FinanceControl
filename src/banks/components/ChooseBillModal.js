@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
-import CategoryList from './CategoryList';
 import TextField from '@mui/material/TextField';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';

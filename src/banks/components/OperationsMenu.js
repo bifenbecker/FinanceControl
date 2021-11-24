@@ -1,5 +1,6 @@
+import React from 'react';
+import Box from '@mui/material/Box';
 
-import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -12,8 +13,6 @@ import Tab from '@mui/material/Tab';
 
 import AddOperationModal from './AddOperationModal';
 
-import React, {useEffect, useState} from 'react';
-import Box from '@mui/material/Box';
 
 
 const OperationsMenu = (props) => {
@@ -79,7 +78,7 @@ const OperationsMenu = (props) => {
             </MenuItem>
             <MenuItem onClick={e => {
                 props.setNavValue('6');
-                
+                handleClose();
             }}>
             <ListItemIcon>
                 <ViewListIcon fontSize="small" />

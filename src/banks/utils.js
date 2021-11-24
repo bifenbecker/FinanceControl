@@ -5,6 +5,7 @@ const SERVICE_NAME = 'bankAccounts';
 function logout(){
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    window.location.reload();
 }
 
 export async function create_bill(body){
@@ -23,6 +24,24 @@ export async function create_bill(body){
     }
     return response;
 }
+
+
+export async function edit_bill(body){
+    const response = await fetch(`${HOST}/${SERVICE_NAME}/bills/api/bill`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'jwt-assertion': localStorage.getItem('access_token')
+                },
+                body: JSON.stringify(body)
+    });
+    if(response.status === 401){
+        logout();
+        window.location.reload();
+    }
+    return response;
+}
+
 
 export async function bill_list(){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/bills/api/list`, {
@@ -43,8 +62,10 @@ export async function category_list(){
             "jwt-assertion": localStorage.getItem('access_token'),
         }
     })
-
-    return response;
+    .catch(error => {
+        logout();
+    })
+    return response;    
 }
 
 export async function create_category(body){
@@ -105,3 +126,5 @@ export async function my_operations(){
             });
     return response;
 }
+
+

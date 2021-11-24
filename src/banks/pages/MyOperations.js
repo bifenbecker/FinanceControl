@@ -3,18 +3,11 @@ import Box from '@mui/material/Box';
 
 import { my_operations } from '../utils';
 
-import OperationPrev from '../components/OperationPrev';
 import ListOperations from '../components/ListOperations';
-import OperationModalView from '../pages/OperationModalView';
+
 
 const MyOperations = (props) => {
     const [operations, setOperations] = useState(undefined);
-    const [openOperationModal, setOperationModal] = React.useState(false);
-    const [selectedOperation, setSelectedOperation] = React.useState(undefined);
-    
-    const handleClose = () => {
-        setOperationModal(false);
-    }
 
     useEffect(() => {
         (
@@ -28,9 +21,10 @@ const MyOperations = (props) => {
     }, []);
 
     return (
-        <div>
+        <Box sx={{ width: 500 }}>
             <ListOperations operations={operations} />
-        </div>
+        </Box>
+        
     );
 }
 

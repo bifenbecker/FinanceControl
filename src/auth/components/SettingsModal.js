@@ -2,6 +2,13 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+
+
+import { get_currencies } from '../utils';
 
 
 const style = {
@@ -17,6 +24,25 @@ const style = {
 };
 
 const SettingsModal = (props) => {
+    const [currency, setCurrency] = React.useState(undefined);
+    const [currencyList, setCurrencyList] = React.useState(undefined);
+
+    const handleChange = (event) => {
+        setCurrency(event.target.value);
+    };
+
+    React.useEffect(() => {
+        (
+            async () => {
+                const response = await get_currencies();
+                const content = await response.json();
+                setCurrencyList(content.map((cur) => {
+                    return {name: cur.name, char: cur.char}
+                }))
+            }
+        )();
+    }, [])
+
     return (
         <div>
 
@@ -27,7 +53,23 @@ const SettingsModal = (props) => {
             aria-describedby="modal-modal-description"
         >
             <Box sx={style}>
-            Settings
+            <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Currency</InputLabel>
+                <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={currency}
+                defaultValue={props.user.settings.currency.name}
+                label="Currency"
+                onChange={handleChange}
+                >
+                    {
+                        currencyList.map(currency => {
+                            return <MenuItem value={currency.name}>{currency.name + " - " + currency.char}</MenuItem>
+                        })
+                    }
+                </Select>
+            </FormControl>
             </Box>
         </Modal>
         </div>

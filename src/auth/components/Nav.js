@@ -6,7 +6,6 @@ import Tab from '@mui/material/Tab';
 import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
-import AppsIcon from '@mui/icons-material/Apps';
 
 
 import TabContext from '@mui/lab/TabContext';
@@ -15,7 +14,6 @@ import TabPanel from '@mui/lab/TabPanel';
 
 import Login from "../pages/Login";
 import Register from "../pages/Register";
-import Home from '../pages/Home';
 import ListBills from '../../banks/pages/ListBills';
 
 import ProfileMenu from './ProfileMenu';
@@ -32,7 +30,7 @@ const Nav = (props) => {
     const logout = () => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        setNavValue('1');
+        setNavValue('2');
         props.setUser(undefined);
     }
 
@@ -68,7 +66,7 @@ const Nav = (props) => {
             <TabPanel value="2"><Login setNavValue={setNavValue} setUser={props.setUser}/></TabPanel>
             <TabPanel value="3"><Register setNavValue={setNavValue}/></TabPanel>
             <TabPanel value="4"><ListBills setValue={setNavValue} setActiveBill={setActiveBill}/></TabPanel>
-            <TabPanel value="5"><BillView bill={activeBill} setNavValue={setNavValue}/></TabPanel>
+            <TabPanel value="5"><BillView bill={activeBill} setNavValue={setNavValue} setActiveBill={setActiveBill}/></TabPanel>
             <TabPanel value="6"><MyOperations /></TabPanel>
         </TabContext>
     );

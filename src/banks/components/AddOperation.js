@@ -55,7 +55,7 @@ export default function AddOperation(props) {
     const [bill, setBill] = React.useState(props.bill);
     const [date, setDate] = React.useState(new Date());
     const [description, setDescription] = React.useState('');
-    const [error, setError] = React.useState('');
+    const [error, setError] = React.useState(undefined);
 
     const [openChooseCategoryModal, setChooseCategoryModal] = React.useState(false);
     const [openChooseBillModal, setChooseBillModal] = React.useState(false);
@@ -63,28 +63,26 @@ export default function AddOperation(props) {
     const [isSendRequest, setIsSendRequest] = useState(false);
     
     const submit = async () => {
-        console.log({
-            category,
-            description,
-            value,
-            isIncome,
-            bill
-        })
-        const response = await add_operation({
-            category: category.id,
-            description,
-            value,
-            isIncome,
-        }, bill.uuid);
-        const content = await response.json();
-        props.setNavValue('5')
-        props.handleClose();
+        if(bill !== undefined) {
+            const response = await add_operation({
+                category: category.id,
+                description,
+                value,
+                isIncome,
+            }, bill.uuid);
+            props.setNavValue('5')
+            props.handleClose();
+            setError(undefined);
+        }
+        else{
+            setError('Choose bill');
+        }
+        
     }
     const handleChange = (event, newValue) => {
         setNavValue(newValue);
     };
 
-    // TODO: Fix all time requests
     useEffect(() => {
         (
             async () => {
@@ -176,11 +174,11 @@ export default function AddOperation(props) {
                                 />
                             </div>
 
-                            <div class="row">
-                                <div class="col text-center">
+                            <div className="row">
+                                <div className="col text-center">
                                 <Button variant="outlined" onClick={submit}>CREATE</Button>
                                 <p className="mt-5">
-                                    {error !== ''? error: ''}
+                                    {error !== undefined? error: null}
                                 </p>
                                 </div>
                             </div>

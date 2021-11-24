@@ -52,3 +52,12 @@ export async function delete_user(){
             });
     return response;
 }
+
+export async function get_currencies(){
+    const response = await fetch(`${HOST}/${SERVICE_NAME}/api/сurrencies`, {
+                // headers: {
+                //     'jwt-assertion': localStorage.getItem('access_token'),
+                // }
+            });
+    return response;
+}

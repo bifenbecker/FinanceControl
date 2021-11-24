@@ -9,7 +9,6 @@ import Tooltip from '@mui/material/Tooltip';
 import CreateIcon from '@mui/icons-material/Create';
 import ViewListIcon from '@mui/icons-material/ViewList';
 
-import ListBills from '../../banks/pages/ListBills';
 import CreateBillModal from './CreateBillModal';
 import Tab from '@mui/material/Tab';
 

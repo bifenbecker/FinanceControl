@@ -1,17 +1,13 @@
 import React, {useEffect, useState} from 'react';
-
-import { ThemeProvider, createTheme } from '@mui/system';
 import Box from '@mui/material/Box';
-import { green, purple } from '@mui/material/colors';
-import PropTypes from 'prop-types';
 
+import { ThemeProvider } from '@mui/system';
+import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DownloadIcon from '@mui/icons-material/Download';
-import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
 import Zoom from '@mui/material/Zoom';
 import SwipeableViews from 'react-swipeable-views';
 import AppBar from '@mui/material/AppBar';
@@ -25,12 +21,11 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 
 import EditBill from '../components/EditBill';
 import AddOperationModal from '../components/AddOperationModal';
 
-import { operations_of_bill } from '../utils';
+import { operations_of_bill, edit_bill } from '../utils';
 import ListOperations from '../components/ListOperations';
 import StatisticOfOperations from '../components/StatisticOfOperations';
 
@@ -74,45 +69,15 @@ const fabStyle = {
     right: 16,
 };
 
-const fabGreenStyle = {
-    color: 'common.white',
-    bgcolor: green[500],
-    '&:hover': {
-        bgcolor: green[600],
-    },
-};
-
-function get_stat(operations) {
-    var income = 0;
-    var payment = 0;
-    console.log(operations)
-    for (var i = 0; i < operations.length; i++) {
-        if(operations[i].isIncome === true) {
-            try{
-                income += Number(operations[i].value);
-            }
-            catch{
-                continue;
-            }
-        }
-        else{
-            try{
-                payment += Number(operations[i].value);
-            }
-            catch{
-                continue;
-            }
-            
-        }
-    }
-    return [income, payment];
-}
 
 const BillView = (props) => {
     
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
     const [openAddOperationModal, setAddOperationModal] = React.useState(false);
+
+    const [newName, setNewName] = useState(undefined);
+    const [newBalance, setNewBalance] = useState(undefined);
 
     const handleClose = (e) => {
         setAddOperationModal(false);
@@ -145,15 +110,25 @@ const BillView = (props) => {
                 setOperations(content.map((operation) => {
                     return operation
                 }))
-                setIncomeValue(content.filter((value) => value.isIncome === true).map((operation) => Number(operation.value)).reduce((acc, value) => acc + value));
-                setPaymentValue(content.filter((value) => value.isIncome === false).map((operation) => Number(operation.value)).reduce((acc, value) => acc + value));
+                if(content.length > 0){
+                    setIncomeValue(content.filter((value) => value.isIncome === true).map((operation) => Number(operation.value)).reduce((acc, value) => acc + value));
+                    setPaymentValue(content.filter((value) => value.isIncome === false).map((operation) => Number(operation.value)).reduce((acc, value) => acc + value));
+                }
+                
             }
         )();
     }, []);
     
 
-    const editBank = () => {
-        console.log(2);
+    const editBill = async () => {
+        if(newName !== undefined && newBalance !== undefined) {
+            const response = await edit_bill({
+                name: newName,
+                balance: newBalance
+            })
+            const content = await response.json();
+            props.setActiveBill(content);
+        }
     }
     const downloadStatistic = () => {
         console.log(2);
@@ -179,7 +154,7 @@ const BillView = (props) => {
             sx: fabStyle,
             icon: <EditIcon />,
             label: 'Edit bank',
-            onClick: editBank
+            onClick: editBill
         }
     ];
 
@@ -272,7 +247,7 @@ const BillView = (props) => {
                             <StatisticOfOperations operations={operations} />
                         </TabPanel>
                         <TabPanel value={value} index={2} dir={theme.direction}>
-                            <EditBill bill={props.bill}/>
+                            <EditBill bill={props.bill} setNewName={setNewName} setNewBalance={setNewBalance}/>
                         </TabPanel>
                     </SwipeableViews>
                     {fabs.map((fab, index) => (

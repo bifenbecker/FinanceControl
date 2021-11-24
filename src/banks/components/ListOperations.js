@@ -1,11 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import { operations_of_bill } from '../utils';
+import React, {useState} from 'react';
 import Box from '@mui/material/Box';
-import { blue, grey, green, deepOrange } from '@mui/material/colors';
-import List from '@mui/material/List';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemButton from '@mui/material/ListItemButton';
-import Divider from '@mui/material/Divider';
+
 import OperationModalView from '../pages/OperationModalView';
 import OperationPrev from './OperationPrev';
 
@@ -18,9 +13,9 @@ const ListOperations = (props) => {
         setOperationModal(false);
     }
     return (
-        <Box sx={{ width: '100%', height: '100%', maxWidth: 360, bgcolor: '#e0e0e0', fontWeight: 800, mb: 2 }} >
+        <Box sx={{ width: '100%', height: '100%', bgcolor: '#e0e0e0', fontWeight: 800, m: 3 }} >
             {selectedOperation !== undefined ? 
-            <OperationModalView openModal={openOperationModal} setOpen={setOperationModal} handleClose={handleClose} operation={selectedOperation}/>
+            <OperationModalView openModal={openOperationModal} setOpen={setOperationModal} handleClose={handleClose} operation={selectedOperation} setOperation={setSelectedOperation}/>
             : null
             }
             {props.operations? 

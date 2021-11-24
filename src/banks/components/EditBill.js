@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -34,10 +34,6 @@ const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, r
 
 
 export default function EditBill(props) {
-    const [newName, setNewName] = useState('');
-    const [newBalance, setNewBalance] = useState('');
-
-
     return (
         <form ref={props.formRef}>
             <Box sx={{ '& button': { m: 1 } }}>
@@ -47,7 +43,7 @@ export default function EditBill(props) {
                         label="Name"
                         defaultValue={props.bill.name}
                         variant="standard"
-                        onChange={e => setNewName(e.target.value)}
+                        onChange={e => props.setNewName(e.target.value)}
                     />
                 </div>
 
@@ -55,7 +51,7 @@ export default function EditBill(props) {
                     <TextField
                         label="Balance"
                         defaultValue={props.bill.balance}
-                        onChange={e => setNewBalance(e.target.value)}
+                        onChange={e => props.setNewBalance(e.target.value)}
                         name="numberformat"
                         id="formatted-numberformat-input"
                         InputProps={{
