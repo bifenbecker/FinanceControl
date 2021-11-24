@@ -8,7 +8,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import User, RefreshToken
+from .models import User, RefreshToken, Settings, CURRENCY_CHOICES
 from .serializers import UserSerializer
 from .utils import gen_pair_tokens, verify_user, validate_data_for_user, all_methods_check_token
 
@@ -65,6 +65,7 @@ class LoginView(APIView):
 
         response = Response()
         user = User.objects.filter(email=email).first()
+
         if user is None:
             response.data = {
                 'email': 'User not found!'
@@ -121,3 +122,12 @@ class RefreshTokenView(APIView):
             return Response({
                 'error': 'No verify token'
             }, status=status.HTTP_403_FORBIDDEN)
+
+
+class CurrencyList(APIView):
+    def get(self, request):
+        data = []
+        for cur in CURRENCY_CHOICES:
+            data.append({'name': cur[0], 'char': cur[1]})
+
+        return Response(data)

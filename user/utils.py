@@ -13,7 +13,7 @@ from rest_framework import status, serializers
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
-from .models import User
+from .models import User, Settings
 
 
 def verify_access_token(token: str) -> Union[dict, None]:
@@ -45,9 +45,10 @@ def gen_pair_tokens(user):
     """
     Get access token and refresh token for user
     """
-
+    user_settings = user.settings
     payload_for_access_token = {
         'id': user.id,
+        'settings': user_settings.data,
         'exp': int(time.time()) + int(settings.JWT["ACCESS_TOKEN_LIFETIME"].seconds),
         'iat': int(time.time()),
         'iss': settings.ISSUER,

@@ -11,5 +11,6 @@ urlpatterns = [
     })),
     path('api/login', LoginView.as_view()),
     path('api/jwks.json', json_token),
-    path('api/refresh-token', RefreshTokenView.as_view())
+    path('api/refresh-token', RefreshTokenView.as_view()),
+    path('api/сurrencies', CurrencyList.as_view()),
 ]
