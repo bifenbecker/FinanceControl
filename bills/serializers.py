@@ -6,7 +6,7 @@ from .models import Bill
 class BillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bill
-        fields = ('uuid', 'user_id', 'name', 'balance')  # todo: Delete user_id field
+        exclude = ['user_id']
 
 
     def update(self, instance, validated_data):

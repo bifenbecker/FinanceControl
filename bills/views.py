@@ -54,7 +54,7 @@ class BillViewSet:
         Create bank
         """
         bill_data = request.data
-        bill_data.update({'user_id': kwargs['user_id']})
+        bill_data.update({'user_id': kwargs['user_id'], 'currency': kwargs['decoded_payload']['settings']['currency']})
         serialiser = BillSerializer(data=bill_data)
         serialiser.is_valid(raise_exception=True)
         serialiser.save()

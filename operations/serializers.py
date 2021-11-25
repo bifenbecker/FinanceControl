@@ -17,7 +17,7 @@ class OperationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Operation
-        fields = ['uuid', 'description', 'date', 'isIncome', 'value', 'category']
+        fields = ['uuid', 'description', 'date', 'isIncome', 'value', 'category', 'currency']
 
     def to_representation(self, instance):
         ret = super(OperationSerializer, self).to_representation(instance=instance)

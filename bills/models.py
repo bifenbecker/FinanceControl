@@ -12,7 +12,10 @@ class Bill(models.Model):
     user_id = models.PositiveIntegerField(blank=False, verbose_name="ID User")
     name = models.CharField(max_length=64, blank=False, verbose_name="Name of bill")
     balance = models.DecimalField(default=0.0, max_digits=9, decimal_places=2, verbose_name="Current balance")
-    start_balance = models.DecimalField(editable=False, default=0.0, max_digits=9, decimal_places=2, verbose_name="Start balance")
+    start_balance = models.DecimalField(editable=False, default=0.0, max_digits=9, decimal_places=2,
+                                        verbose_name="Start balance")
+
+    currency = models.CharField(max_length=3, default='USD')
 
     def update_balance(self):
         operations = [operation_to_bill.operation for operation_to_bill in self.operations.all()]
@@ -27,7 +30,8 @@ class Bill(models.Model):
         return self.balance
 
     def add_operation(self, category: Union[int, None], description: Optional[str] = "",
-                      value: Optional[float] = 0.0, isIncome: Optional[bool] = True) -> Optional[Operation]:
+                      value: Optional[float] = 0.0, currency: Union[str, None] = None,
+                      isIncome: Optional[bool] = True) -> Optional[Operation]:
         """
             Valiadte data and create operation
             :param user_id: ID user
@@ -49,7 +53,8 @@ class Bill(models.Model):
             'user_id': self.user_id,
             'description': description,
             'isIncome': isIncome,
-            'value': value
+            'value': value,
+            'currency': currency
         })
         serializer_operation.is_valid(raise_exception=True)
         if serializer_operation.is_valid():

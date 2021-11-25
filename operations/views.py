@@ -52,7 +52,7 @@ class OperationViewSet:
     def create(self, request, *args, **kwargs):
         bill = kwargs['bill']
         try:
-            operation = bill.add_operation(**request.data)
+            operation = bill.add_operation(**request.data, currency=kwargs['decoded_payload']['settings']['currency'])
         except Exception as e:
             return str(e), status.HTTP_400_BAD_REQUEST
         serializer = OperationSerializer(instance=operation)

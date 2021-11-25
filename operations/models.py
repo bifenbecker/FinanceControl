@@ -19,6 +19,7 @@ class Operation(models.Model):
     isIncome = models.BooleanField(default=True)
     value = models.DecimalField(default=0.0, max_digits=9, decimal_places=2, verbose_name="Value of operation",
                                 blank=False)
+    currency = models.CharField(max_length=3, default='USD')
 
 
 class OperationToBill(models.Model):
