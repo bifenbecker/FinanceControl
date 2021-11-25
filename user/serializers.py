@@ -10,7 +10,7 @@ class SettingsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Settings
-        exclude = ['user', 'id']
+        fields = ('currency',)
 
     def get_currency(self, obj):
         return {'name': obj.currency, 'char': obj.get_currency_display()}

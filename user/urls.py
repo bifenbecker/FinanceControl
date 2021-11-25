@@ -13,4 +13,8 @@ urlpatterns = [
     path('api/jwks.json', json_token),
     path('api/refresh-token', RefreshTokenView.as_view()),
     path('api/сurrencies', CurrencyList.as_view()),
+    path('api/user_settings', UserSettingsView.as_view({
+        'put': 'update',
+        'get': 'get'
+    })),
 ]

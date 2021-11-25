@@ -8,10 +8,9 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import User, RefreshToken, Settings, CURRENCY_CHOICES
-from .serializers import UserSerializer
+from .models import User, RefreshToken, CURRENCY_CHOICES
+from .serializers import UserSerializer, SettingsSerializer
 from .utils import gen_pair_tokens, verify_user, validate_data_for_user, all_methods_check_token
-
 
 
 @all_methods_check_token
@@ -131,3 +130,25 @@ class CurrencyList(APIView):
             data.append({'name': cur[0], 'char': cur[1]})
 
         return Response(data)
+
+
+@all_methods_check_token
+class UserSettingsView(viewsets.ViewSet):
+    def get(self, request, *args, **kwargs):
+        user = kwargs['user']
+        user_settings_serializer = SettingsSerializer(instance=user.settings)
+        return user_settings_serializer.data, status.HTTP_200_OK
+
+    def update(self, request, *args, **kwargs):
+        user = kwargs['user']
+        user_settings = user.settings
+        if 'currency' in request.data:
+            cur = request.data['currency']
+            try:
+                user_settings.set_currency(cur)
+            except Exception as e:
+                return str(e), status.HTTP_400_BAD_REQUEST
+
+        user_settings_serializer = SettingsSerializer(instance=user_settings)
+        return user_settings_serializer.data, status.HTTP_200_OK
+

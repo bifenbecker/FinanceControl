@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -48,6 +49,13 @@ class Settings(models.Model):
         return {
             'currency': self.currency
         }
+
+    def set_currency(self, new_currency: Optional[str]):
+        if new_currency in [choice_cur[0] for choice_cur in CURRENCY_CHOICES]:
+            self.currency = new_currency
+            self.save()
+        else:
+            raise Exception(f"No such currency - ({new_currency})")
 
 
 class RefreshToken(models.Model):
