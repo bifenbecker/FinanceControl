@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Box from '@mui/material/Box';
 
-import { my_operations } from '../utils';
+import { my_operations, convertValue } from '../utils';
 
 import ListOperations from '../components/ListOperations';
 
@@ -15,14 +15,20 @@ const MyOperations = (props) => {
                 const response = await my_operations();
                 const content = await response.json();
 
-                setOperations(content.map((operation) => {return operation}))
+                setOperations(content.map((operation) => {
+                    var convertedValue = convertValue(operation.currency, props.settings.currency.name, operation.value);
+                    var currencyChar = props.settings.currency.char;
+                    operation['convertedValue'] = convertedValue;
+                    operation['char'] =  currencyChar
+                    return operation;
+                }))
             }
         )();
     }, []);
-
+    
     return (
         <Box sx={{ width: 500 }}>
-            <ListOperations operations={operations} />
+            <ListOperations operations={operations}/>
         </Box>
         
     );

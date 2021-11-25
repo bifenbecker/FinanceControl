@@ -14,6 +14,7 @@ import AppBar from '@mui/material/AppBar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
+import { green, deepOrange } from '@mui/material/colors';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -25,7 +26,7 @@ import TableRow from '@mui/material/TableRow';
 import EditBill from '../components/EditBill';
 import AddOperationModal from '../components/AddOperationModal';
 
-import { operations_of_bill, edit_bill } from '../utils';
+import { operations_of_bill, edit_bill, convertValue } from '../utils';
 import ListOperations from '../components/ListOperations';
 import StatisticOfOperations from '../components/StatisticOfOperations';
 
@@ -108,11 +109,15 @@ const BillView = (props) => {
                 const response = await operations_of_bill(props.bill.uuid);
                 const content = await response.json();
                 setOperations(content.map((operation) => {
-                    return operation
+                    var convertedValue = convertValue(operation.currency, props.settings.currency.name, operation.value);
+                    var currencyChar = props.settings.currency.char;
+                    operation['convertedValue'] = convertedValue;
+                    operation['char'] =  currencyChar
+                    return operation;
                 }))
                 if(content.length > 0){
-                    setIncomeValue(content.filter((value) => value.isIncome === true).map((operation) => Number(operation.value)).reduce((acc, value) => acc + value));
-                    setPaymentValue(content.filter((value) => value.isIncome === false).map((operation) => Number(operation.value)).reduce((acc, value) => acc + value));
+                    setIncomeValue(content.filter((value) => value.isIncome === true).map((operation) => Number(operation.convertedValue)).reduce((acc, value) => acc + value));
+                    setPaymentValue(content.filter((value) => value.isIncome === false).map((operation) => Number(operation.convertedValue)).reduce((acc, value) => acc + value));
                 }
                 
             }
@@ -158,6 +163,11 @@ const BillView = (props) => {
         }
     ];
 
+    var convertedCurrentBalance = convertValue(props.bill.currency, props.settings.currency.name, props.bill.balance);
+    var convertedStartBalance = convertValue(props.bill.currency, props.settings.currency.name, props.bill.start_balance);
+    var stat = ((convertedCurrentBalance - convertedStartBalance)/100).toFixed(2);
+    var currencyChar = props.settings.currency.char;
+
     return (
         <div>
             <AddOperationModal openModal={openAddOperationModal} setOpen={setAddOperationModal} handleClose={handleClose} bill={props.bill} setNavValue={props.setNavValue}/>
@@ -174,7 +184,13 @@ const BillView = (props) => {
                         {props.bill.name}
                     </Box>
                     <Box sx={{ color: 'text.primary', fontSize: 22 }}>
-                    Balance: {props.bill.balance}
+                    Balance: {convertedCurrentBalance + currencyChar}
+                    </Box>
+                    <Box sx={{ color: 'text.primary', fontSize: 13 }}>
+                    Start balance: {convertedStartBalance + currencyChar + " - " + props.bill.start_balance + ` (${props.bill.currency})`}
+                    </Box>
+                    <Box sx={{ color: stat > 0? green[300]: deepOrange[400], fontSize: 15, fontWeight: 600 }}>
+                    {stat > 0? "+" + stat: "-" + stat}%
                     </Box>
                     <TableContainer>
                         <Table sx={{ width: '100%' }} aria-label="simple table">
@@ -188,8 +204,8 @@ const BillView = (props) => {
                             <TableRow
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
-                                <TableCell>{incomeValue}</TableCell>
-                                <TableCell>{paymentValue}</TableCell>
+                                <TableCell>{incomeValue? incomeValue.toFixed(2): null}</TableCell>
+                                <TableCell>{paymentValue? paymentValue.toFixed(2): null}</TableCell>
                             </TableRow>
                         </TableBody>
                         </Table>
@@ -239,7 +255,7 @@ const BillView = (props) => {
                         <TabPanel
                             value={value} index={0} dir={theme.direction}
                         >
-                            <ListOperations operations={operations} />
+                            <ListOperations user={props.user} operations={operations} />
                         </TabPanel>
                         <TabPanel
                             value={value} index={1} dir={theme.direction}
@@ -247,7 +263,7 @@ const BillView = (props) => {
                             <StatisticOfOperations operations={operations} />
                         </TabPanel>
                         <TabPanel value={value} index={2} dir={theme.direction}>
-                            <EditBill bill={props.bill} setNewName={setNewName} setNewBalance={setNewBalance}/>
+                            <EditBill convertedBalance={convertedCurrentBalance} settings={props.settings} bill={props.bill} setNewName={setNewName} setNewBalance={setNewBalance}/>
                         </TabPanel>
                     </SwipeableViews>
                     {fabs.map((fab, index) => (

@@ -19,7 +19,7 @@ function process_operations(operations, isIncome) {
         if(category === null || category === undefined) {
             category = "No category";
         }
-        let value = Number(operation.value);
+        let value = Number(operation.convertedValue);
         if(operation.isIncome === isIncome) {
             if(category in data) {
                 data[category] += value;

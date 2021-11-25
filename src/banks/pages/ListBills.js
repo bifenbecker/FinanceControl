@@ -7,7 +7,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 
-import { bill_list } from '../utils';
+import { bill_list, convertValue } from '../utils';
 
 
 const BillPrev = (props) => {
@@ -57,7 +57,7 @@ const BillPrev = (props) => {
                             ml: 2
                         }}
                         primary={props.bill.name} 
-                        secondary={props.bill.balance}
+                        secondary={convertValue(props.bill.currency, props.settings.currency.name, props.bill.balance) + props.settings.currency.char}
                     />
                 </ListItemButton>
             </Grid>
@@ -82,7 +82,7 @@ const ListBills = (props) => {
                     window.location.reload();
                 }
                 else if(response.status === 200){
-                    setBillList(content.map((bill) => <BillPrev bill={bill} setValue={props.setValue} setActiveBill={props.setActiveBill}/>));
+                    setBillList(content.map((bill) => <BillPrev settings={props.settings} bill={bill} setValue={props.setValue} setActiveBill={props.setActiveBill}/>));
                 } 
             }
         )();

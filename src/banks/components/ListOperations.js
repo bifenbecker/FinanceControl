@@ -15,7 +15,7 @@ const ListOperations = (props) => {
     return (
         <Box sx={{ width: '100%', height: '100%', bgcolor: '#e0e0e0', fontWeight: 800, m: 3 }} >
             {selectedOperation !== undefined ? 
-            <OperationModalView openModal={openOperationModal} setOpen={setOperationModal} handleClose={handleClose} operation={selectedOperation} setOperation={setSelectedOperation}/>
+            <OperationModalView user={props.user} openModal={openOperationModal} setOpen={setOperationModal} handleClose={handleClose} operation={selectedOperation} setOperation={setSelectedOperation}/>
             : null
             }
             {props.operations? 

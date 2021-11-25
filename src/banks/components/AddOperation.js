@@ -2,8 +2,6 @@ import React, {useState, useEffect} from 'react';
 
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import NumberFormat from 'react-number-format';
-import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 
 import TabContext from '@mui/lab/TabContext';
@@ -13,36 +11,9 @@ import Tab from '@mui/material/Tab';
 
 import ChooseCategoryModal from './ChooseCategoryModal';
 import ChooseBillModal from './ChooseBillModal';
+import NumberFormatCustom from './NumberFormatInput';
 
 import {category_list, bill_list, add_operation} from '../utils'
-
-
-const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, ref) {
-    const { onChange, ...other } = props;
-
-    return (
-        <NumberFormat
-            {...other}
-            getInputRef={ref}
-            onValueChange={(values) => {
-                onChange({
-                    target: {
-                    name: props.name,
-                    value: values.value,
-                    },
-                });
-            }}
-                thousandSeparator
-                isNumericString
-                prefix={"$"}
-        />
-    );
-    });
-    
-    NumberFormatCustom.propTypes = {
-        name: PropTypes.string.isRequired,
-        onChange: PropTypes.func.isRequired,
-    };
 
 
 export default function AddOperation(props) {
@@ -117,7 +88,7 @@ export default function AddOperation(props) {
                                     label={isIncome? `+${value}`: `-${value}`}
                                     defaultValue={value}
                                     onChange={e => setValue(e.target.value)}
-                                    name={isIncome? "income":"payment"}
+                                    name={props.settings.currency.char}
                                     id="formatted-numberformat-input"
                                     InputProps={{
                                         inputComponent: NumberFormatCustom

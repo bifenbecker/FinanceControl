@@ -9,6 +9,16 @@ import Grid from '@mui/material/Grid';
 
 
 const OperationPrev = (props) => {
+
+    // React.useEffect(() => {
+    //     (
+    //         async () => {
+    //             await convertValue();
+    //         }
+    //     )();
+    // }, []);
+    
+
     return (
             <List
                 sx={{
@@ -30,7 +40,7 @@ const OperationPrev = (props) => {
                     props.setSelectedOperation(props.operation)
                 }}>
                     <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-                        <Grid item xs={8}>
+                        <Grid item xs={6}>
                             <Grid item xs={6} >
                                 <ListItemText 
                                     primaryTypographyProps={{
@@ -67,7 +77,7 @@ const OperationPrev = (props) => {
                                 }
                             </Grid>
                         </Grid>
-                        <Grid item xs={2} sx={{ textAlign: 'center', mt: "7%" }}>
+                        <Grid item xs={6} sx={{ mt: '2%' }}>
                             <ListItemText 
                                 primaryTypographyProps={{
                                     fontSize: 19,
@@ -77,7 +87,15 @@ const OperationPrev = (props) => {
                                     ml: 2,
                                     
                                 }}
-                                primary={props.operation.isIncome? "+" + props.operation.value: "-" + props.operation.value} // TODO: load currency
+                                secondaryTypographyProps={{
+                                    fontSize: 13,
+                                    fontWeight: 300,
+                                    letterSpacing: 0,
+                                    color: grey[900],
+                                    ml: 2
+                                }}
+                                primary={props.operation.isIncome? "+" + props.operation.convertedValue + props.operation.char: "-" + props.operation.convertedValue + props.operation.char}
+                                secondary={"Start value: " + props.operation.value + `(${props.operation.currency})`}
                             />
                         </Grid>
                     </Grid>

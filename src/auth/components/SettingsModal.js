@@ -8,7 +8,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
 
-import { get_currencies } from '../utils';
+import { get_currencies, update_settings } from '../utils';
 
 
 const style = {
@@ -27,18 +27,28 @@ const SettingsModal = (props) => {
     const [currency, setCurrency] = React.useState(undefined);
     const [currencyList, setCurrencyList] = React.useState(undefined);
 
-    const handleChange = (event) => {
+    const handleChange = async (event) => {
         setCurrency(event.target.value);
+
+        const response = await update_settings({
+            currency: event.target.value
+        })
+        const content = await response.json();
+        if(response.status === 200){
+            props.user.settings.currency = content.currency;
+        }
+        
     };
 
     React.useEffect(() => {
         (
             async () => {
-                const response = await get_currencies();
-                const content = await response.json();
+                let response = await get_currencies();
+                let content = await response.json();
                 setCurrencyList(content.map((cur) => {
                     return {name: cur.name, char: cur.char}
                 }))
+                
             }
         )();
     }, [])
@@ -56,17 +66,19 @@ const SettingsModal = (props) => {
             <FormControl fullWidth>
                 <InputLabel id="demo-simple-select-label">Currency</InputLabel>
                 <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={currency}
-                defaultValue={props.user.settings.currency.name}
-                label="Currency"
-                onChange={handleChange}
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={currency}
+                    defaultValue={props.user.settings.currency.name}
+                    label="Currency"
+                    onChange={handleChange}
                 >
                     {
+                        currencyList !== undefined?
                         currencyList.map(currency => {
                             return <MenuItem value={currency.name}>{currency.name + " - " + currency.char}</MenuItem>
                         })
+                        : null
                     }
                 </Select>
             </FormControl>

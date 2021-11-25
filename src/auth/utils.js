@@ -55,9 +55,28 @@ export async function delete_user(){
 
 export async function get_currencies(){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/api/сurrencies`, {
-                // headers: {
-                //     'jwt-assertion': localStorage.getItem('access_token'),
-                // }
             });
     return response;
 }
+
+export async function update_settings(body){
+    const response = await fetch(`${HOST}/${SERVICE_NAME}/api/user_settings`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'jwt-assertion': localStorage.getItem('access_token'),
+                },
+                body: JSON.stringify(body)
+            });
+    return response;
+}
+
+
+// export async function get_user_settings(){
+//     const response = await fetch(`${HOST}/${SERVICE_NAME}/api/user_settings`, {
+//                 headers: {
+//                     'jwt-assertion': localStorage.getItem('access_token'),
+//                 }
+//             });
+//     return response;
+// }

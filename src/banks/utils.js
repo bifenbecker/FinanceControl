@@ -1,6 +1,32 @@
+import fx from 'money'
+
 const HOST = 'http://localhost:10000';
 
 const SERVICE_NAME = 'bankAccounts';
+
+
+export function convertValue(from_, to_, value){
+
+    // const response = await fetch('http://api.exchangeratesapi.io/v1/latest?access_key=d8299a9b5c4316d93b8ebd864ac72ae4')
+    // const content = await response.json();
+
+    fx.base = "EUR";
+    // fx.base = content.base;
+    
+    // fx.settings = {from: "USD", to: "EUR"}
+    fx.settings = {from: from_, to: to_}
+    // fx.rates = content.rates;
+    fx.rates = {
+        BTC: 0.000019240079,
+        BYN: 2.8171,
+        EUR: 1,
+        RUB: 83.754387,
+        USD: 1.122359
+    }
+    return to_ === 'BTC' ? fx.convert(Number(value)) : fx.convert(Number(value)).toFixed(2);
+}
+
+
 
 function logout(){
     localStorage.removeItem('access_token');

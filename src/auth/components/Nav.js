@@ -46,7 +46,7 @@ const Nav = (props) => {
         <ProfileMenu logout={logout} user={props.user} setUser={props.setUser} />
         <Tab icon={<HomeIcon />} label="HOME" value="1" />
         <BillsMenu setNavValue={setNavValue}/>
-        <OperationsMenu setNavValue={setNavValue}/>
+        <OperationsMenu settings={props.user?props.user.settings: undefined} setNavValue={setNavValue}/>
     </TabList>
     }
     else{
@@ -56,7 +56,6 @@ const Nav = (props) => {
         <Tab icon={<AppRegistrationIcon />} label="REGISTER" value="3"/>
     </TabList>
     }
-
     return (
         <TabContext value={value}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -65,9 +64,9 @@ const Nav = (props) => {
             <TabPanel value="1">Home</TabPanel>
             <TabPanel value="2"><Login setNavValue={setNavValue} setUser={props.setUser}/></TabPanel>
             <TabPanel value="3"><Register setNavValue={setNavValue}/></TabPanel>
-            <TabPanel value="4"><ListBills setValue={setNavValue} setActiveBill={setActiveBill}/></TabPanel>
-            <TabPanel value="5"><BillView bill={activeBill} setNavValue={setNavValue} setActiveBill={setActiveBill}/></TabPanel>
-            <TabPanel value="6"><MyOperations /></TabPanel>
+            <TabPanel value="4"><ListBills settings={props.user?props.user.settings: undefined} setValue={setNavValue} setActiveBill={setActiveBill}/></TabPanel>
+            <TabPanel value="5"><BillView settings={props.user?props.user.settings: undefined} bill={activeBill} setNavValue={setNavValue} setActiveBill={setActiveBill}/></TabPanel>
+            <TabPanel value="6"><MyOperations settings={props.user?props.user.settings: undefined}/></TabPanel>
         </TabContext>
     );
 };
