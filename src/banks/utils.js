@@ -23,7 +23,7 @@ export function convertValue(from_, to_, value){
         RUB: 83.754387,
         USD: 1.122359
     }
-    return to_ === 'BTC' ? fx.convert(Number(value)) : fx.convert(Number(value)).toFixed(2);
+    return to_ === 'BTC' ? fx.convert(Number(value)).toFixed(8) : fx.convert(Number(value)).toFixed(2);
 }
 
 

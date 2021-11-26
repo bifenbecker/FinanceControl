@@ -88,7 +88,7 @@ export default function AddOperation(props) {
                                     label={isIncome? `+${value}`: `-${value}`}
                                     defaultValue={value}
                                     onChange={e => setValue(e.target.value)}
-                                    name={props.settings.currency.char}
+                                    name={props.settings? props.settings.currency.char : null}
                                     id="formatted-numberformat-input"
                                     InputProps={{
                                         inputComponent: NumberFormatCustom

@@ -74,7 +74,7 @@ const OperationsMenu = (props) => {
                 <AddIcon fontSize="small" />
             </ListItemIcon>
             Add operation
-            <AddOperationModal settings={props.settings} openModal={openAddOperationModal} setOpen={setAddOperationModal} handleClose={handleClose} />
+            <AddOperationModal settings={props.settings} setNavValue={props.setNavValue} openModal={openAddOperationModal} setOpen={setAddOperationModal} handleClose={handleClose} />
             </MenuItem>
             <MenuItem onClick={e => {
                 props.setNavValue('6');

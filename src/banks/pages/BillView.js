@@ -170,7 +170,7 @@ const BillView = (props) => {
 
     return (
         <div>
-            <AddOperationModal openModal={openAddOperationModal} setOpen={setAddOperationModal} handleClose={handleClose} bill={props.bill} setNavValue={props.setNavValue}/>
+            <AddOperationModal settings={props.settings} openModal={openAddOperationModal} setOpen={setAddOperationModal} handleClose={handleClose} bill={props.bill} setNavValue={props.setNavValue}/>
             <ThemeProvider theme={theme}>
                 <Box
                     sx={{
@@ -190,7 +190,7 @@ const BillView = (props) => {
                     Start balance: {convertedStartBalance + currencyChar + " - " + props.bill.start_balance + ` (${props.bill.currency})`}
                     </Box>
                     <Box sx={{ color: stat > 0? green[300]: deepOrange[400], fontSize: 15, fontWeight: 600 }}>
-                    {stat > 0? "+" + stat: "-" + stat}%
+                    {stat > 0? "+" + stat: stat}%
                     </Box>
                     <TableContainer>
                         <Table sx={{ width: '100%' }} aria-label="simple table">
