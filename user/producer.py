@@ -10,7 +10,8 @@ connection = pika.BlockingConnection(params)
 channel = connection.channel()
 
 
-def publish():
+def logger(body, key='logger'):
+    msg = f'Service: Auth - {body}'
     channel.basic_publish(exchange='',
-                          routing_key='hello',
-                          body='Hello World!')
+                          routing_key=key,
+                          body=msg)

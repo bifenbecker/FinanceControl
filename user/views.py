@@ -9,8 +9,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User, RefreshToken, CURRENCY_CHOICES
+
 from .serializers import UserSerializer, SettingsSerializer
-from .utils import gen_pair_tokens, verify_user, validate_data_for_user, all_methods_check_token
+from .utils import gen_pair_tokens, verify_user, validate_data_for_user, all_methods_check_token, process_response
 
 
 @all_methods_check_token
@@ -20,7 +21,7 @@ class UserViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         serializer = UserSerializer(kwargs['user'])
-        return serializer.data, status.HTTP_200_OK
+        return serializer.data, status.HTTP_200_OK, None
 
     def update(self, request, *args, **kwargs):
         user = kwargs['user']
@@ -33,31 +34,35 @@ class UserViewSet(viewsets.ViewSet):
 
                 user.save()
                 serializer = UserSerializer(user)
-                return serializer.data, status.HTTP_202_ACCEPTED
+                return serializer.data, status.HTTP_202_ACCEPTED, f'User was updated - {user.id}'
 
             except serializers.ValidationError as e:
-                return {'msg': e.get_full_details()[0]['message']}, status.HTTP_304_NOT_MODIFIED
+                return {'msg': e.get_full_details()[0]['message']}, status.HTTP_304_NOT_MODIFIED,\
+                       'Update user error. Validation error(1)'
 
             except Exception as e:
-                return {'msg': str(e)}, status.HTTP_304_NOT_MODIFIED
+                return {'msg': str(e)}, status.HTTP_304_NOT_MODIFIED, 'Update user error.(2)'
         else:
-            return {'msg': 'User was blocked'}, status.HTTP_423_LOCKED
+            return {'msg': 'User was blocked'}, status.HTTP_423_LOCKED, 'Update user error. Block(2)'
 
     def destroy(self, request, *args, **kwargs):
         user = kwargs['user']
+        id = user.id
         user.delete()
-        return {'msg': 'User was deleted'}, status.HTTP_202_ACCEPTED
+        return {'msg': 'User was deleted'}, status.HTTP_202_ACCEPTED, f'User - {id} was deleted'
 
 
 class RegisterView(APIView):
+    @process_response
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        user = serializer.save()
+        return serializer.data, status.HTTP_201_CREATED, f'Register new user - id:{user.id} Username:{user.username}'
 
 
 class LoginView(APIView):
+    @process_response
     def post(self, request):
         email = request.data['email']
         password = request.data['password']
@@ -66,35 +71,30 @@ class LoginView(APIView):
         user = User.objects.filter(email=email).first()
 
         if user is None:
-            response.data = {
+            return {
                 'email': 'User not found!'
-            }
-            response.status_code = status.HTTP_404_NOT_FOUND
-            return response
+            }, status.HTTP_404_NOT_FOUND, None
 
         if not user.check_password(password):
-            response.data = {
+            return {
                 'password': 'Incorrect password!'
-            }
-            response.status_code = status.HTTP_400_BAD_REQUEST
-            return response
+            }, status.HTTP_400_BAD_REQUEST, None
 
         verified_user, response.status_code = verify_user(user)
 
         if not verified_user:
-            response.data = {
+            return {
                 'msg': 'No user'
-            }
-            return response
+            }, status.HTTP_404_NOT_FOUND, None
 
         access_token, refresh_token = gen_pair_tokens(user)
         user.last_login = datetime.datetime.utcnow()
         user.save()
-        response.data = {
+
+        return {
             'access_token': access_token,
             'refresh_token': refresh_token
-        }
-        return response
+        }, status.HTTP_200_OK, f'User - {user.id} logged'
 
 
 def json_token(request):
@@ -124,12 +124,13 @@ class RefreshTokenView(APIView):
 
 
 class CurrencyList(APIView):
+    @process_response
     def get(self, request):
         data = []
         for cur in CURRENCY_CHOICES:
             data.append({'name': cur[0], 'char': cur[1]})
 
-        return Response(data)
+        return data, status.HTTP_200_OK, None
 
 
 @all_methods_check_token
@@ -137,7 +138,7 @@ class UserSettingsView(viewsets.ViewSet):
     def get(self, request, *args, **kwargs):
         user = kwargs['user']
         user_settings_serializer = SettingsSerializer(instance=user.settings)
-        return user_settings_serializer.data, status.HTTP_200_OK
+        return user_settings_serializer.data, status.HTTP_200_OK, None
 
     def update(self, request, *args, **kwargs):
         user = kwargs['user']
@@ -147,8 +148,8 @@ class UserSettingsView(viewsets.ViewSet):
             try:
                 user_settings.set_currency(cur)
             except Exception as e:
-                return str(e), status.HTTP_400_BAD_REQUEST
+                return str(e), status.HTTP_400_BAD_REQUEST, f'User settings update error - {str(e)}(3)'
 
         user_settings_serializer = SettingsSerializer(instance=user_settings)
-        return user_settings_serializer.data, status.HTTP_200_OK
+        return user_settings_serializer.data, status.HTTP_200_OK, f'Settings of user - {user.id} was updated'
 

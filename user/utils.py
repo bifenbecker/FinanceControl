@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from .models import User, Settings
+from .producer import logger
 
 
 def verify_access_token(token: str) -> Union[dict, None]:
@@ -148,7 +149,12 @@ def process_response(func):
     """
 
     def wrapper(*args, **kwargs):
-        data, response_status_code = func(*args, **kwargs)
+        data, response_status_code, logger_msg = func(*args, **kwargs)
+        if logger_msg:
+            try:
+                logger(logger_msg)
+            except:
+                print("Message was not send")
         return Response(
             data=data,
             status=response_status_code
@@ -170,8 +176,8 @@ def check_token(func):
             user, status_code = verify_user(claims['id'])
             if status_code in [200, 423]:
                 kwargs.update({'user': user})
-                res, code = func(request, *args, **kwargs)
-                return res, code
+                res, code, msg = func(request, *args, **kwargs)
+                return res, code, msg
             else:
                 return {'msg': "Error"}, status_code
         except Exception as e:
@@ -205,3 +211,4 @@ def all_methods_check_token(cls):
                 return attr
 
     return Cls
+
