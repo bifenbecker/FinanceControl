@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from bills.models import Bill
 from operations.models import Operation, OperationToBill, CategoryToUser
 from operations.serializers import OperationSerializer
+from producer import logger
 
 HOST = 'http://docker.for.mac.localhost:10000'
 
@@ -62,8 +63,8 @@ def get_payload(func):
         decoded_payload = decode_base64(encoded_payload)
         if decoded_payload:
             kwargs.update({'decoded_payload': json.loads(decoded_payload)})
-            res, status_code = func(request, *args, **kwargs)
-            return res, status_code
+            res, status_code, msg = func(request, *args, **kwargs)
+            return res, status_code, msg
         else:
             return f'Error in decoded payload', status.HTTP_400_BAD_REQUEST
 
@@ -78,7 +79,13 @@ def process_response(func):
     """
 
     def wrapper(*args, **kwargs):
-        data, response_status_code = func(*args, **kwargs)
+        data, response_status_code, logger_msg = func(*args, **kwargs)
+        if logger_msg:
+            try:
+                logger(logger_msg)
+            except:
+                print("Message was not send")
+
         if isinstance(data, str):
             data = {'msg': data}
         return Response(
@@ -108,8 +115,8 @@ def get_operation(func):
 
         if operation:
             kwargs.update({'operation': operation})
-            res, status_code = func(self=self, request=request, *args, **kwargs)
-            return res, status_code
+            res, status_code, msg = func(self=self, request=request, *args, **kwargs)
+            return res, status_code, msg
         else:
             return {'msg': 'Incorrect uuid'}, status.HTTP_404_NOT_FOUND
 
@@ -140,8 +147,8 @@ def get_bill(func):
 
         if bill:
             kwargs.update({'bill': bill})
-            res, status_code = func(self=self, request=request, *args, **kwargs)
-            return res, status_code
+            res, status_code, msg = func(self=self, request=request, *args, **kwargs)
+            return res, status_code, msg
         else:
             return {'msg': 'Incorrect uuid'}, status.HTTP_404_NOT_FOUND
 
@@ -163,8 +170,8 @@ def get_user_id_from_payload(func):
         if decoded_payload:
             user_id = decoded_payload['id']
             kwargs.update({'user_id': user_id})
-            res, status_code = func(*args, **kwargs)
-            return res, status_code
+            res, status_code, msg = func(*args, **kwargs)
+            return res, status_code, msg
         else:
             return "Payload is None", status.HTTP_400_BAD_REQUEST
 

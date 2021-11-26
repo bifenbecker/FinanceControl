@@ -14,12 +14,12 @@ class OperationViewSet:
     def list(self, request, *args, **kwargs):
         operations = Operation.objects.filter(category__user_id=kwargs['user_id']).all()
         serializer = OperationSerializer(operations, many=True)
-        return serializer.data, status.HTTP_200_OK
+        return serializer.data, status.HTTP_200_OK, None
 
     @get_operation
     def retrieve(self, request, *args, **kwargs):
         serializer = OperationSerializer(instance=kwargs['operation'])
-        return serializer.data, status.HTTP_200_OK
+        return serializer.data, status.HTTP_200_OK, None
 
     @get_operation
     def update(self, request, *args, **kwargs):
@@ -32,13 +32,14 @@ class OperationViewSet:
         if not serializer.is_valid():
             return {
                        'msg': 'Not valid data'
-                   }, status.HTTP_400_BAD_REQUEST
+                   }, status.HTTP_400_BAD_REQUEST, f'Update operation error. Not valid data(4)'
         serializer.save()
         bill.update_balance()
-        return serializer.data, status.HTTP_200_OK
+        return serializer.data, status.HTTP_200_OK, f'Operation was updated'
 
     @get_operation
     def destroy(self, request, *args, **kwargs):
+        # todo: Bad deleting
         operation = kwargs['operation']
         operation.delete()
         bill = operation.to_bill.bill
@@ -46,7 +47,7 @@ class OperationViewSet:
 
         return {
                    'msg': 'Operation was deleted'
-               }, status.HTTP_200_OK
+               }, status.HTTP_200_OK, None
 
     @get_bill
     def create(self, request, *args, **kwargs):
@@ -54,9 +55,9 @@ class OperationViewSet:
         try:
             operation = bill.add_operation(**request.data, currency=kwargs['decoded_payload']['settings']['currency'])
         except Exception as e:
-            return str(e), status.HTTP_400_BAD_REQUEST
+            return str(e), status.HTTP_400_BAD_REQUEST, None
         serializer = OperationSerializer(instance=operation)
-        return serializer.data, status.HTTP_200_OK
+        return serializer.data, status.HTTP_200_OK, f'Operation was added - Operation:{operation.id} to Bill: {bill.id}'
 
 
 @all_methods_get_payload(viewsets.ViewSet)
@@ -65,7 +66,7 @@ class CategoryListView:
     def list(self, request, *args, **kwargs):
         categories = CategoryToUser.objects.filter(user_id=kwargs['user_id'])
         serializer = CategorySerializer(categories, many=True)
-        return serializer.data, status.HTTP_200_OK
+        return serializer.data, status.HTTP_200_OK, None
 
 
 @all_methods_get_payload(viewsets.ViewSet)
@@ -76,10 +77,10 @@ class CategoryView:
 
         serializer = CategorySerializer(data={"name": request.data.get("name", ""), "isIncome": isIncome, "user_id": kwargs['user_id']})
         if serializer.is_valid(raise_exception=False):
-            serializer.save(user_id=kwargs['user_id'])
-            return serializer.data, status.HTTP_200_OK
+            category = serializer.save(user_id=kwargs['user_id'])
+            return serializer.data, status.HTTP_200_OK, f'Category was added - Name: {category.name} to User: {kwargs["user_id"]}'
         else:
-            return "Not valid data", status.HTTP_400_BAD_REQUEST
+            return "Not valid data", status.HTTP_400_BAD_REQUEST, f'Added category was error. Not valid data(5)'
 
 
 @all_methods_get_payload(APIView)
@@ -90,4 +91,4 @@ class ListOperationsOfBill:
         bill.update_balance()
         operations = [operation_to_bill.operation for operation_to_bill in bill.operations.all()]
         serializer = OperationSerializer(operations, many=True)
-        return serializer.data, status.HTTP_200_OK
+        return serializer.data, status.HTTP_200_OK, None

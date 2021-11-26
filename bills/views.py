@@ -17,7 +17,7 @@ class BillViewSet:
 
         user_bills = Bill.objects.filter(user_id=kwargs['user_id']).all()
         serializer = BillSerializer(user_bills, many=True)
-        return serializer.data, status.HTTP_200_OK
+        return serializer.data, status.HTTP_200_OK, None
 
     @get_bill
     def retrieve(self, request, **kwargs):
@@ -25,7 +25,7 @@ class BillViewSet:
         Get bank
         """
         serializer = BillSerializer(kwargs['bill'])
-        return serializer.data, status.HTTP_200_OK
+        return serializer.data, status.HTTP_200_OK, None
 
     @get_bill
     def update(self, request, **kwargs):
@@ -36,8 +36,11 @@ class BillViewSet:
         new_bill_data['user_id'] = kwargs['user_id']
         bill = kwargs['bill']
         serializer = BillSerializer(instance=bill)
-        serializer.update(bill, new_bill_data)
-        return serializer.data, status.HTTP_202_ACCEPTED
+        try:
+            serializer.update(bill, new_bill_data)
+        except:
+            return 'Error. No update bill', status.HTTP_400_BAD_REQUEST, f'Bill - {bill.id} was not updated'
+        return serializer.data, status.HTTP_202_ACCEPTED, f'Bill - {bill.id} was updated'
 
     @get_bill
     def destroy(self, request, **kwargs):
@@ -46,7 +49,7 @@ class BillViewSet:
         """
         bill = kwargs['bill']
         bill.delete()
-        return {'msg': 'Bill was deleted'}, status.HTTP_202_ACCEPTED
+        return {'msg': 'Bill was deleted'}, status.HTTP_202_ACCEPTED, f'Bill - {bill.id} was deleted'
 
     @get_user_id_from_payload
     def create(self, request, **kwargs):
@@ -57,8 +60,8 @@ class BillViewSet:
         bill_data.update({'user_id': kwargs['user_id'], 'currency': kwargs['decoded_payload']['settings']['currency']})
         serialiser = BillSerializer(data=bill_data)
         serialiser.is_valid(raise_exception=True)
-        serialiser.save()
-        return serialiser.data, status.HTTP_202_ACCEPTED
+        bill = serialiser.save()
+        return serialiser.data, status.HTTP_202_ACCEPTED, f'Create bill - {bill.id} User: {kwargs["user_id"]}'
 
 
 
