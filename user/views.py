@@ -105,22 +105,23 @@ def json_token(request):
     return HttpResponse(json.dumps(data))
 
 
-class RefreshTokenView(APIView):
+class RefreshTokensView(APIView):
+    @process_response
     def post(self, request):
         token = request.data.get('refresh_token')
         refresh_token = RefreshToken.objects.filter(token=token).first()
-        if refresh_token and refresh_token.is_valid():
+        if refresh_token and refresh_token.is_valid(token):
             user = refresh_token.user
             refresh_token.delete()
             access_token, refresh_token = gen_pair_tokens(user)
-            return Response({
+            return {
                 'access_token': access_token,
                 'refresh_token': refresh_token
-            }, status=status.HTTP_200_OK)
+            }, status.HTTP_200_OK, None
         else:
-            return Response({
+            return {
                 'error': 'No verify token'
-            }, status=status.HTTP_403_FORBIDDEN)
+            }, status.HTTP_403_FORBIDDEN, None
 
 
 class CurrencyList(APIView):

@@ -168,7 +168,7 @@ def check_token(func):
         try:
             access_token = request.headers.get('jwt-assertion')
         except:
-            return {'msg': "No token"}, status.HTTP_400_BAD_REQUEST
+            return {'msg': "No token"}, status.HTTP_400_BAD_REQUEST, None
 
         try:
             claims = verify_access_token(access_token)
@@ -179,9 +179,9 @@ def check_token(func):
                 res, code, msg = func(request, *args, **kwargs)
                 return res, code, msg
             else:
-                return {'msg': "Error"}, status_code
+                return {'msg': "Error"}, status_code, None
         except Exception as e:
-            return {'msg': str(e)}, status.HTTP_400_BAD_REQUEST
+            return {'msg': str(e)}, status.HTTP_400_BAD_REQUEST, None
 
     return wrapper
 

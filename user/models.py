@@ -67,6 +67,6 @@ class RefreshToken(models.Model):
     def __str__(self):
         return self.token
 
-    def is_valid(self):
-        return datetime.datetime.utcnow().timestamp() < self.end_time.timestamp()
+    def is_valid(self, token: str) -> bool:
+        return datetime.datetime.utcnow().timestamp() < self.end_time.timestamp() and self.token == token
 # endregion

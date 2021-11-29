@@ -153,7 +153,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 # region JWT SETTINGS
 JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # todo: Change value lifetime
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),  # todo: Change value lifetime
     'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
     'ALGORITHM': 'RS256',
     'SIGNING_KEY_ACCESS': SECRET_KEY + "_access",
