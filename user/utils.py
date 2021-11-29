@@ -62,7 +62,7 @@ def gen_pair_tokens(user):
     token = jwt.JWT(header={"alg": settings.JWT["ALGORITHM"], "type": "JWT"}, claims=payload_for_access_token)
 
     key = settings.KEY
-    # key = jwk.JWK(**settings.KEY)
+    # key = jwk.JWK.generate(**settings.KEY)
     token.make_signed_token(key)
     access_token = token.serialize()
 

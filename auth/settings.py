@@ -153,7 +153,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 # region JWT SETTINGS
 JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),  # todo: Change value lifetime
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),  # todo: Change value lifetime
     'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
     'ALGORITHM': 'RS256',
     'SIGNING_KEY_ACCESS': SECRET_KEY + "_access",
@@ -167,10 +167,10 @@ AUDIENCES = [
 
 KEY = jwk.JWK.generate(kty='RSA', size=2048, kid=SECRET_KEY)
 # KEY = {
-#     "kty": "RSA",
-#     "kid": "secret",
-#     "n": "o1g_fECe5ZxHGgzl8b9qUMIZyv2biUtvfqvWC-E9BwVf3SDRJ7ExRjMgavNyuRhs0YWYw94Z3NBO5BLQ7NU5y3PhVretzqaqUFoV98hcoP0apU-ZFZOzdUpkEUA7RtvehzZSqfKZSPOCZ0A0pP3u1DxGoL1aB5N-pK0lo4FBI-KCanptprKQUMscD66gxTzYTVNqFhoNxozsEmDCbIYxHrJ0g7ercEb2ewondQ46miGOtjfQFEZU3YWLDQ3h1fTyLsTVyBveRGlk9036Auv1r89gJ7X1xlcmYiGIelwbvvjjgi97lzcQv-mc516nZKGFwdeqsfFoYtecdRR6BWfg1w",
-#     "e": "AQAB"
+#     'kty': 'RSA',
+#     'kid': 'secret',
+#     'n': 'zeiN0CxMfAVSooeKc4ia2U4Nk05aYD_geTwD4htNrbeoK0EKx4rCS9ED9ZaSa4vN5GTW5Ik-8LUg4kn1MxW2ZXnKrEyLHuPcvE8NLiXKzmjgs1plH4iNxTvG3k1enOLn-0kJSRVPfw7NotboU4Zj1WYENukVgKHoyisuBk07ELqIWKw1uP-xsjqiveeWEo3ELP5RyDKkiZ-a1fxLQGsKly7OhxoklHZhxugx2zuJKAivpSsgrcjDoxXudtvYzwX1DCjtHVz1E1VncihPjcRnDqN9rlGEx22tzSQxSKcGWa3ldCNSs_yGlcst2ALi-3Sq2JsoSgMlrgnTRu6SlXJ9WQ',
+#     'e': 'AQAB'
 # }
 # endregion
 

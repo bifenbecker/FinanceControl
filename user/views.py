@@ -98,8 +98,8 @@ class LoginView(APIView):
 
 
 def json_token(request):
-    # key = jwk.JWK.generate(kty='RSA', size=2048, kid=settings.SECRET_KEY)
     data = {
+        # "keys": [settings.KEY]
         "keys": [settings.KEY.export_public(as_dict=True)]
     }
     return HttpResponse(json.dumps(data))
@@ -110,18 +110,20 @@ class RefreshTokensView(APIView):
     def post(self, request):
         token = request.data.get('refresh_token')
         refresh_token = RefreshToken.objects.filter(token=token).first()
-        if refresh_token and refresh_token.is_valid(token):
-            user = refresh_token.user
-            refresh_token.delete()
-            access_token, refresh_token = gen_pair_tokens(user)
-            return {
-                'access_token': access_token,
-                'refresh_token': refresh_token
-            }, status.HTTP_200_OK, None
+        if refresh_token:
+            if refresh_token.is_valid():
+                user = refresh_token.user
+                refresh_token.delete()
+                access_token, refresh_token = gen_pair_tokens(user)
+                return {
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                }, status.HTTP_200_OK, None
+            else:
+                return 'No verify token', status.HTTP_403_FORBIDDEN, None
         else:
-            return {
-                'error': 'No verify token'
-            }, status.HTTP_403_FORBIDDEN, None
+            return 'No such token', status.HTTP_400_BAD_REQUEST, None
+
 
 
 class CurrencyList(APIView):
