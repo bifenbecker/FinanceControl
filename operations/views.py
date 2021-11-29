@@ -52,6 +52,7 @@ class OperationViewSet:
     @get_bill
     def create(self, request, *args, **kwargs):
         bill = kwargs['bill']
+        print(kwargs['decoded_payload']['settings']['currency'])
         try:
             operation = bill.add_operation(**request.data, currency=kwargs['decoded_payload']['settings']['currency'])
         except Exception as e:

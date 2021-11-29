@@ -6,6 +6,9 @@ from django.db import models
 from operations.models import Operation, OperationToBill, CategoryToUser
 from operations.serializers import OperationSerializer
 
+from forex_python.converter import CurrencyRates
+from forex_python.bitcoin import BtcConverter
+
 
 class Bill(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -21,10 +24,22 @@ class Bill(models.Model):
         operations = [operation_to_bill.operation for operation_to_bill in self.operations.all()]
         start_balance = self.start_balance
         for operation in operations:
-            if operation.isIncome:
-                start_balance += operation.value
+            converter = CurrencyRates()
+            converter_btc = BtcConverter()
+
+            if self.currency == operation.currency:
+                converted_value = operation.value
+            elif self.currency == 'BTC':
+                converted_value = converter_btc.convert_to_btc(operation.value, operation.currency)
+            elif operation.currency == 'BTC':
+                converted_value = converter_btc.convert_to_btc(operation.value, self.currency)
             else:
-                start_balance -= operation.value
+                converted_value = converter.convert(operation.currency, self.currency, operation.value)
+
+            if operation.isIncome:
+                start_balance += converted_value
+            else:
+                start_balance -= converted_value
         self.balance = start_balance
         self.save()
         return self.balance
@@ -42,6 +57,7 @@ class Bill(models.Model):
             :param isIncome:
             :return: Operation
             """
+        print("ADD: ", currency)
         if category:
             Category = CategoryToUser.objects.filter(id=category).first()
             if not Category:

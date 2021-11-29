@@ -60,7 +60,7 @@ class BillViewSet:
         bill_data.update({'user_id': kwargs['user_id'], 'currency': kwargs['decoded_payload']['settings']['currency']})
         serialiser = BillSerializer(data=bill_data)
         serialiser.is_valid(raise_exception=True)
-        bill = serialiser.save()
+        bill = serialiser.save(user_id=kwargs['user_id'])
         return serialiser.data, status.HTTP_202_ACCEPTED, f'Create bill - {bill.id} User: {kwargs["user_id"]}'
 
 
