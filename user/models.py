@@ -9,7 +9,6 @@ CURRENCY_CHOICES = (
     ('USD', '$'),
     ('EUR', '€'),
     ('RUB', '₽'),
-    ('BYN', 'Br'),
     ('BTC', 'BTC')
 )
 

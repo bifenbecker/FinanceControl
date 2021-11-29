@@ -152,5 +152,8 @@ class UserSettingsView(viewsets.ViewSet):
                 return str(e), status.HTTP_400_BAD_REQUEST, f'User settings update error - {str(e)}(3)'
 
         user_settings_serializer = SettingsSerializer(instance=user_settings)
-        return user_settings_serializer.data, status.HTTP_200_OK, f'Settings of user - {user.id} was updated'
+        access_token, refresh_token = gen_pair_tokens(user)
+        result = user_settings_serializer.data
+        result.update({'access_token': access_token, 'refresh_token': refresh_token})
+        return result, status.HTTP_200_OK, f'Settings of user - {user.id} was updated'
 
