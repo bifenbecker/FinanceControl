@@ -43,7 +43,6 @@ export default function AddOperation(props) {
                 isIncome,
             }, bill.uuid);
             if(response !== undefined){
-                props.setNavValue('5')
                 props.handleClose();
                 setError(undefined);
             }
@@ -133,7 +132,7 @@ export default function AddOperation(props) {
                                     variant="standard"
                                     onClick={e => {setChooseBillModal(true)}}
                                 />
-                                <ChooseBillModal openModal={openChooseBillModal} setOpen={setChooseBillModal} billList={billList} setBill={setBill}/>
+                                <ChooseBillModal settings={props.settings} openModal={openChooseBillModal} setOpen={setChooseBillModal} billList={billList} setBill={setBill}/>
                             </div>
                             {/* //TODO: Change on date */}
                             <div className="m-5">

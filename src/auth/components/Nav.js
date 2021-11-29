@@ -45,7 +45,7 @@ const Nav = (props) => {
         tablist = <TabList onChange={handleChange} aria-label="lab API tabs example">
         <ProfileMenu logout={logout} user={props.user} setUser={props.setUser} />
         <Tab icon={<HomeIcon />} label="HOME" value="1" />
-        <BillsMenu setNavValue={setNavValue}/>
+        <BillsMenu settings={props.user?props.user.settings: undefined} setNavValue={setNavValue}/>
         <OperationsMenu settings={props.user?props.user.settings: undefined} setNavValue={setNavValue}/>
     </TabList>
     }

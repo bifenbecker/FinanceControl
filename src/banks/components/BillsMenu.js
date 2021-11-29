@@ -72,7 +72,7 @@ const BillsMenu = (props) => {
                 <CreateIcon fontSize="small" />
             </ListItemIcon>
             Create bill
-            <CreateBillModal openModal={openCreateBillModal} setOpen={setCreateBillModal} handleClose={handleClose}/>
+            <CreateBillModal settings={props.settings?props.settings: undefined} openModal={openCreateBillModal} setOpen={setCreateBillModal} handleClose={handleClose}/>
             </MenuItem>
             <MenuItem onClick={e => {
                 props.setNavValue('4');

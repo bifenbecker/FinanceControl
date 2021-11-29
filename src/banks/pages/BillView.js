@@ -111,19 +111,25 @@ const BillView = (props) => {
                 const response = await request(props.bill.uuid);
                 if(response !== undefined){
                     const content = await response.json();
-                setOperations(content.map((operation) => {
-                    var convertedValue = convertValue(operation.currency, props.settings.currency.name, operation.value);
-                    var currencyChar = props.settings.currency.char;
-                    operation['convertedValue'] = convertedValue;
-                    operation['char'] =  currencyChar
-                    return operation;
-                }))
-                if(content.length > 0){
-                    setIncomeValue(content.filter((value) => value.isIncome === true).map((operation) => Number(operation.convertedValue)).reduce((acc, value) => acc + value));
-                    setPaymentValue(content.filter((value) => value.isIncome === false).map((operation) => Number(operation.convertedValue)).reduce((acc, value) => acc + value));
+                    setOperations(content.map((operation) => {
+                        var convertedValue = convertValue(operation.currency, props.settings.currency.name, operation.value);
+                        var currencyChar = props.settings.currency.char;
+                        operation['convertedValue'] = convertedValue;
+                        operation['char'] =  currencyChar
+                        return operation;
+                    }))
+                    let income_operations = content.filter((value) => value.isIncome === true);
+                    let payment_operations = content.filter((value) => value.isIncome === false);
+                    if(income_operations.length > 0){
+                        setIncomeValue(income_operations.map((operation) => Number(operation.convertedValue)).reduce((acc, value) => acc + value));
+                    }
+                    if(payment_operations.length > 0){
+                        setPaymentValue(payment_operations.map((operation) => Number(operation.convertedValue)).reduce((acc, value) => acc + value));
+                    }
+                    
+                    
                 }
                 }
-            }
         )();
     }, []);
     

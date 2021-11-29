@@ -1,41 +1,14 @@
-import React, {SyntheticEvent, useState} from 'react';
+import React from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 
-import NumberFormat from 'react-number-format';
-import PropTypes from 'prop-types';
+import NumberFormatCustom from '../components/NumberFormatInput';
 
 import { create_bill } from '../utils';
 
 
-const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, ref) {
-    const { onChange, ...other } = props;
-    
-    return (
-        <NumberFormat
-        {...other}
-        getInputRef={ref}
-        onValueChange={(values) => {
-            onChange({
-                target: {
-                name: props.name,
-                value: values.value,
-                },
-            });
-        }}
-            thousandSeparator
-            isNumericString
-            prefix="$" //TODO: Load from settings 
-        />
-    );
-    });
-    
-    NumberFormatCustom.propTypes = {
-        name: PropTypes.string.isRequired,
-        onChange: PropTypes.func.isRequired,
-    };
 
 
 
@@ -83,7 +56,7 @@ const CreateBill = (props) => {
                 }
                 else{
                     const content = await response.json();
-                    setError(content);
+                    setError(content['msg']);
                 }
             }
             props.setOpen(false);
@@ -117,7 +90,7 @@ const CreateBill = (props) => {
                         label="Start balance"
                         value={balance}
                         onChange={e => setBankBalance(e.target.value)}
-                        name="numberformat"
+                        name={props.settings?props.settings.currency.char: null}
                         id="formatted-numberformat-input"
                         InputProps={{
                         inputComponent: NumberFormatCustom,

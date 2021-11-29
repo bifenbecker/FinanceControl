@@ -44,8 +44,7 @@ export async function checkToken(func) {
                     localStorage.setItem("refresh_token", content['refresh_token']);
 
                 }else{
-                    localStorage.removeItem('access_token');
-                    localStorage.removeItem('refresh_token');
+                    logout();
                 }
             }
             
