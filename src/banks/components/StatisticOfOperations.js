@@ -10,6 +10,9 @@ import Tab from '@mui/material/Tab';
 import ListOperations from './ListOperations';
 import StatTable from './Table';
 
+import { DataGrid,GridToolbarContainer,
+    GridToolbarExport } from '@mui/x-data-grid';
+
 
 function process_operations(operations, isIncome) {
     var result = [];
@@ -33,7 +36,7 @@ function process_operations(operations, isIncome) {
     for(var key in data) {
         result.push({
             name: key,
-            value: data[key]
+            value: data[key].toFixed(2)
         })
     }
     return result;

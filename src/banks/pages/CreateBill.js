@@ -68,21 +68,25 @@ const CreateBill = (props) => {
 
     const submit = async () => {
         if(validate(name, balance)){
-            const response = await create_bill({
+            const request = await create_bill;
+            const response = await request({
                 name,
                 balance
             })
+            if(response !== undefined){
+                
+                if(response.status === 200 || response.status === 202){
+                    setError('');
+                }
+                else if(response.status === 401){
+                    window.location.reload();
+                }
+                else{
+                    const content = await response.json();
+                    setError(content);
+                }
+            }
             props.setOpen(false);
-            if(response.status === 200 || response.status === 202){
-                setError('');
-            }
-            else if(response.status === 401){
-                window.location.reload();
-            }
-            else{
-                const content = await response.json();
-                setError(content);
-            }
         }
     }
 

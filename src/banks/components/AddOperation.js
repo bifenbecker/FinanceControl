@@ -35,15 +35,22 @@ export default function AddOperation(props) {
     
     const submit = async () => {
         if(bill !== undefined) {
-            const response = await add_operation({
+            const request = await add_operation;
+            const response = await request({
                 category: category.id,
                 description,
                 value,
                 isIncome,
             }, bill.uuid);
-            props.setNavValue('5')
-            props.handleClose();
-            setError(undefined);
+            if(response !== undefined){
+                props.setNavValue('5')
+                props.handleClose();
+                setError(undefined);
+            }
+            else{
+                setError('No success of adding operation');
+            }
+            
         }
         else{
             setError('Choose bill');
@@ -59,18 +66,25 @@ export default function AddOperation(props) {
             async () => {
                 if(localStorage.getItem('access_token') !== null){
                     if(categoryList === undefined && billList === undefined && isSendRequest === false){
-                        let response = await category_list();
-                    
-                        if(response.status === 200){
-                            const content = await response.json();
-                            setCategoryList(content.map((category) => category));
+                        let request = await category_list;
+                        let response = await request();
+                        
+                        if(response !== undefined){
+                            if(response.status === 200){
+                                const content = await response.json();
+                                setCategoryList(content.map((category) => category));
+                            }
                         }
-                        response = await bill_list();
-                    
-                        if(response.status === 200){
-                            const content = await response.json();
-                            setBillList(content.map((bill) => bill));
+                        request = await bill_list;
+                        response = await request();
+                        
+                        if(response !== undefined){
+                            if(response.status === 200){
+                                const content = await response.json();
+                                setBillList(content.map((bill) => bill));
+                            }
                         }
+                        
                         setIsSendRequest(true);
                     }
                     

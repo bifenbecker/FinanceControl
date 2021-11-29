@@ -29,14 +29,17 @@ const SettingsModal = (props) => {
 
     const handleChange = async (event) => {
         setCurrency(event.target.value);
-
-        const response = await update_settings({
+        const request = update_settings;
+        const response = await request({
             currency: event.target.value
         })
-        const content = await response.json();
-        if(response.status === 200){
-            props.user.settings.currency = content.currency;
+        if(response !== undefined){
+            const content = await response.json();
+            if(response.status === 200){
+                props.user.settings.currency = content.currency;
+            }
         }
+        
         
     };
 

@@ -16,6 +16,7 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import { green, deepOrange } from '@mui/material/colors';
 
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -106,8 +107,10 @@ const BillView = (props) => {
     useEffect(() => {
         (
             async () => {
-                const response = await operations_of_bill(props.bill.uuid);
-                const content = await response.json();
+                const request = await operations_of_bill;
+                const response = await request(props.bill.uuid);
+                if(response !== undefined){
+                    const content = await response.json();
                 setOperations(content.map((operation) => {
                     var convertedValue = convertValue(operation.currency, props.settings.currency.name, operation.value);
                     var currencyChar = props.settings.currency.char;
@@ -119,7 +122,7 @@ const BillView = (props) => {
                     setIncomeValue(content.filter((value) => value.isIncome === true).map((operation) => Number(operation.convertedValue)).reduce((acc, value) => acc + value));
                     setPaymentValue(content.filter((value) => value.isIncome === false).map((operation) => Number(operation.convertedValue)).reduce((acc, value) => acc + value));
                 }
-                
+                }
             }
         )();
     }, []);
@@ -127,16 +130,37 @@ const BillView = (props) => {
 
     const editBill = async () => {
         if(newName !== undefined && newBalance !== undefined) {
-            const response = await edit_bill({
+            const request = await edit_bill;
+            const response = await request({
                 name: newName,
                 balance: newBalance
             })
-            const content = await response.json();
-            props.setActiveBill(content);
+            if(response !== undefined){
+                const content = await response.json();
+                props.setActiveBill(content);
+            }
+            
         }
     }
     const downloadStatistic = () => {
-        console.log(2);
+        const rows = [
+            ['Category', 'Income/Payment', `Value(${props.settings.currency.char})`, 'Description', 'Date(mm/dd/yyyy)']
+        ];
+        operations.map((operation) => {
+            let row = [operation.category !== null? operation.category: "No category", operation.isIncome? "Yes": "No", operation.convertedValue, operation.description, operation.date];
+            rows.push(row);
+        })
+        
+        let csvContent = "data:text/csv;charset=utf-8," 
+            + rows.map(e => e.join(",")).join("\n");
+
+        var encodedUri = encodeURI(csvContent);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "export.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     const fabs = [

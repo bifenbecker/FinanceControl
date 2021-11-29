@@ -12,16 +12,20 @@ const MyOperations = (props) => {
     useEffect(() => {
         (
             async () => {
-                const response = await my_operations();
-                const content = await response.json();
+                const request = await my_operations;
+                const response = await request();
+                if(response !== undefined){
+                    const content = await response.json();
 
-                setOperations(content.map((operation) => {
-                    var convertedValue = convertValue(operation.currency, props.settings.currency.name, operation.value);
-                    var currencyChar = props.settings.currency.char;
-                    operation['convertedValue'] = convertedValue;
-                    operation['char'] =  currencyChar
-                    return operation;
-                }))
+                    setOperations(content.map((operation) => {
+                        var convertedValue = convertValue(operation.currency, props.settings.currency.name, operation.value);
+                        var currencyChar = props.settings.currency.char;
+                        operation['convertedValue'] = convertedValue;
+                        operation['char'] =  currencyChar
+                        return operation;
+                    }))
+                }
+                
             }
         )();
     }, []);

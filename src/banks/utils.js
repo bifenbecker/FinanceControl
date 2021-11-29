@@ -1,4 +1,5 @@
 import fx from 'money'
+import { checkToken } from '../auth/utils';
 
 const HOST = 'http://localhost:10000';
 
@@ -27,14 +28,7 @@ export function convertValue(from_, to_, value){
 }
 
 
-
-function logout(){
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    window.location.reload();
-}
-
-export async function create_bill(body){
+async function create_bill_f(body){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/bills/api/create-bill`, {
                 method: 'POST',
                 headers: {
@@ -44,15 +38,12 @@ export async function create_bill(body){
                 credentials: 'include',
                 body: JSON.stringify(body)
             });
-    if(response.status === 401){
-        logout();
-        window.location.reload();
-    }
     return response;
 }
+export let create_bill = checkToken(create_bill_f);
 
 
-export async function edit_bill(body){
+async function edit_bill_f(body){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/bills/api/bill`, {
                 method: 'PUT',
                 headers: {
@@ -61,40 +52,34 @@ export async function edit_bill(body){
                 },
                 body: JSON.stringify(body)
     });
-    if(response.status === 401){
-        logout();
-        window.location.reload();
-    }
     return response;
 }
+export let edit_bill = checkToken(edit_bill_f);
 
 
-export async function bill_list(){
+async function bill_list_f(){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/bills/api/list`, {
                 headers: {
                     "jwt-assertion": localStorage.getItem('access_token')
                 }
             })
-    if(response.status === 401){
-        logout();
-        window.location.reload();
-    }
     return response;
 }
+export let bill_list = checkToken(bill_list_f);
 
-export async function category_list(){
+
+async function category_list_f(){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/categories`, {
         headers: {
             "jwt-assertion": localStorage.getItem('access_token'),
         }
     })
-    .catch(error => {
-        logout();
-    })
     return response;    
 }
+export let category_list = checkToken(category_list_f);
 
-export async function create_category(body){
+
+async function create_category_f(body){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/category`, {
                 method: 'POST',
                 headers: {
@@ -105,8 +90,10 @@ export async function create_category(body){
             });
     return response;
 }
+export let create_category = checkToken(create_category_f);
 
-export async function add_operation(body, uuid){
+
+async function add_operation_f(body, uuid){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/operation`, {
                 method: 'POST',
                 headers: {
@@ -118,9 +105,10 @@ export async function add_operation(body, uuid){
             });
     return response;
 }
+export let add_operation = checkToken(add_operation_f);
 
 
-export async function edit_operation(body){
+async function edit_operation_f(body){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/operation`, {
                 method: 'PUT',
                 headers: {
@@ -131,9 +119,10 @@ export async function edit_operation(body){
             });
     return response;
 }
+export let edit_operation = checkToken(edit_operation_f);
 
 
-export async function operations_of_bill(uuid){
+async function operations_of_bill_f(uuid){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/operations-of-bill`, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -143,8 +132,10 @@ export async function operations_of_bill(uuid){
             });
     return response;
 }
+export let operations_of_bill = checkToken(operations_of_bill_f);
 
-export async function my_operations(){
+
+async function my_operations_f(){
     const response = await fetch(`${HOST}/${SERVICE_NAME}/operations/api/operations`, {
                 headers: {
                     'jwt-assertion': localStorage.getItem('access_token'),
@@ -152,5 +143,6 @@ export async function my_operations(){
             });
     return response;
 }
+export let my_operations = checkToken(my_operations_f);
 
 
