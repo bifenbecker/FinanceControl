@@ -3,6 +3,7 @@ services:
   rabbitmq3:
     # image: rabbitmq:3-management
     build: ./rabbitmq
+    # restart: always
     ports:
       # AMQP protocol port
       - '5672:5672'
@@ -43,13 +44,13 @@ services:
     depends_on:
       - envoy
 
-  # queue_auth:
-  #   build: ./auth
-  #   command: python consumer.py
-  #   environment:
-  #     - RABBITMQ_HOST=rabbitmq3
-  #   depends_on:
-  #     - rabbitmq3
+  logger:
+    build: ./logger
+    command: python consumer.py
+    environment:
+      - RABBITMQ_HOST=rabbitmq3
+    depends_on:
+      - rabbitmq3
 
 networks:
   mynetwork:

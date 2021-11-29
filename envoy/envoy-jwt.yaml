@@ -66,9 +66,14 @@ static_resources:
 
                   # Jwt verification for provider1 is required for path prefixed with "prefix"
                   - match:
-                      prefix: /bankAccounts
+                      prefix: /bankAccounts/bills
                     requires:
                       provider_name: auth_provider
+                  - match:
+                      prefix: /bankAccounts/operations
+                    requires:
+                      provider_name: auth_provider
+                      
                 bypass_cors_preflight: 'true'
             
             - name: envoy.filters.http.cors 
