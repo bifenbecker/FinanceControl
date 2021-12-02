@@ -58,19 +58,20 @@ const OperationModalView = (props) => {
     const [description, setDescription] = React.useState(props.operation.description);
 
     const editOperation = async () => {
-        const response = await edit_operation({
+        const request = await edit_operation;
+        const response = await request({
             uuid: props.operation.uuid,
             isIncome,
             value,
             date,
             description
         });
-        const content = await response.json();
+        if(response !== undefined){
+            const content = await response.json();
+            props.setOperation(content);
+        }
+        
     }
-
-    // if(value !== props.operation.value || date !== props.operation.date || description !== props.operation.description){
-    //     setIsVisible(true);
-    // }
 
     const OperationForm = <form>
                         <Box sx={{ '& button': { m: 1 } }} >
@@ -104,7 +105,7 @@ const OperationModalView = (props) => {
                                     disabled
                                     id="standard-required"
                                     label="Bill"
-                                    defaultValue={props.bill.name}
+                                    defaultValue={props.operation.bill? props.operation.bill.name:null}
                                     variant="standard"
                                 />
                             </div>

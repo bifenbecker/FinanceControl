@@ -9,7 +9,6 @@ import Tooltip from '@mui/material/Tooltip';
 import CreateIcon from '@mui/icons-material/Create';
 import ViewListIcon from '@mui/icons-material/ViewList';
 
-import ListBills from '../../banks/pages/ListBills';
 import CreateBillModal from './CreateBillModal';
 import Tab from '@mui/material/Tab';
 
@@ -73,7 +72,7 @@ const BillsMenu = (props) => {
                 <CreateIcon fontSize="small" />
             </ListItemIcon>
             Create bill
-            <CreateBillModal openModal={openCreateBillModal} setOpen={setCreateBillModal} handleClose={handleClose}/>
+            <CreateBillModal settings={props.settings?props.settings: undefined} openModal={openCreateBillModal} setOpen={setCreateBillModal} handleClose={handleClose}/>
             </MenuItem>
             <MenuItem onClick={e => {
                 props.setNavValue('4');

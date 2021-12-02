@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 import Box from '@mui/material/Box';
-import Avatar from '@mui/material/Avatar';
+
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -14,6 +14,7 @@ import Tab from '@mui/material/Tab';
 import AddOperationModal from './AddOperationModal';
 
 
+
 const OperationsMenu = (props) => {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [openAddOperationModal, setAddOperationModal] = React.useState(false);
@@ -25,7 +26,6 @@ const OperationsMenu = (props) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
-
 
     return (
         <React.Fragment>
@@ -74,9 +74,11 @@ const OperationsMenu = (props) => {
                 <AddIcon fontSize="small" />
             </ListItemIcon>
             Add operation
-            <AddOperationModal openModal={openAddOperationModal} setOpen={setAddOperationModal} handleClose={handleClose} />
+            <AddOperationModal settings={props.settings} setNavValue={props.setNavValue} openModal={openAddOperationModal} setOpen={setAddOperationModal} handleClose={handleClose} />
             </MenuItem>
             <MenuItem onClick={e => {
+                props.setNavValue('6');
+                handleClose();
             }}>
             <ListItemIcon>
                 <ViewListIcon fontSize="small" />

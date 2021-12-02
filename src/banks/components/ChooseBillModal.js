@@ -3,7 +3,6 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
-import CategoryList from './CategoryList';
 import TextField from '@mui/material/TextField';
 import NumberFormat from 'react-number-format';
 import PropTypes from 'prop-types';
@@ -94,7 +93,7 @@ const ChooseBillModal = (props) => {
             aria-describedby="modal-modal-description"
         >
             <Box sx={style}>
-                <BillList handleClose={handleClose} billList={props.billList} setBill={props.setBill}/>
+                <BillList settings={props.settings? props.settings: undefined} handleClose={handleClose} billList={props.billList} setBill={props.setBill}/>
                 
                 {
                     isClickedCreateBill?

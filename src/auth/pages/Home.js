@@ -110,16 +110,20 @@ const Home = (props) => {
                 new_data['email'] = email;
             }
             if(JSON.stringify(new_data) !== '{}' && localStorage.getItem('access_token') !== undefined){
-                const response = await edit_user(new_data);
-                if(response.status === 401){
-                    props.setUser(undefined);
-                    localStorage.removeItem('access_token');
-                    localStorage.removeItem('refresh_token');
+                const request = edit_user;
+                let response = await request(new_data);
+                if(response !== undefined){
+                    if(response.status === 401){
+                        props.setUser(undefined);
+                        localStorage.removeItem('access_token');
+                        localStorage.removeItem('refresh_token');
+                    }
+                    else if(response.status === 202){
+                        const content = await response.json();
+                        props.setUser(content);
+                    }
                 }
-                else if(response.status === 202){
-                    const content = await response.json();
-                    props.setUser(content);
-                }
+                
             }
             else{
                 window.location.reload();
@@ -139,11 +143,12 @@ const Home = (props) => {
         setEditState(false);
     }
 
-    const deleteUser = () => {
+    const deleteUser = async () => {
         if(props.user !== undefined){
             let isDelete = window.confirm('delete');
             if(isDelete === true){
-                delete_user();
+                const request = delete_user;
+                let response = await request();
                 window.location.reload();
             }
         }

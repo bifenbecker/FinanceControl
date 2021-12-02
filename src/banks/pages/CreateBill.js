@@ -1,41 +1,14 @@
-import React, {SyntheticEvent, useState} from 'react';
+import React from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 
-import NumberFormat from 'react-number-format';
-import PropTypes from 'prop-types';
+import NumberFormatCustom from '../components/NumberFormatInput';
 
 import { create_bill } from '../utils';
 
 
-const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, ref) {
-    const { onChange, ...other } = props;
-    
-    return (
-        <NumberFormat
-        {...other}
-        getInputRef={ref}
-        onValueChange={(values) => {
-            onChange({
-                target: {
-                name: props.name,
-                value: values.value,
-                },
-            });
-        }}
-            thousandSeparator
-            isNumericString
-            prefix="$" //TODO: Load from settings 
-        />
-    );
-    });
-    
-    NumberFormatCustom.propTypes = {
-        name: PropTypes.string.isRequired,
-        onChange: PropTypes.func.isRequired,
-    };
 
 
 
@@ -68,21 +41,25 @@ const CreateBill = (props) => {
 
     const submit = async () => {
         if(validate(name, balance)){
-            const response = await create_bill({
+            const request = await create_bill;
+            const response = await request({
                 name,
                 balance
             })
+            if(response !== undefined){
+                
+                if(response.status === 200 || response.status === 202){
+                    setError('');
+                }
+                else if(response.status === 401){
+                    window.location.reload();
+                }
+                else{
+                    const content = await response.json();
+                    setError(content['msg']);
+                }
+            }
             props.setOpen(false);
-            if(response.status === 200 || response.status === 202){
-                setError('');
-            }
-            else if(response.status === 401){
-                window.location.reload();
-            }
-            else{
-                const content = await response.json();
-                setError(content);
-            }
         }
     }
 
@@ -113,7 +90,7 @@ const CreateBill = (props) => {
                         label="Start balance"
                         value={balance}
                         onChange={e => setBankBalance(e.target.value)}
-                        name="numberformat"
+                        name={props.settings?props.settings.currency.char: null}
                         id="formatted-numberformat-input"
                         InputProps={{
                         inputComponent: NumberFormatCustom,
@@ -123,8 +100,8 @@ const CreateBill = (props) => {
                 </div>
                 
             </Box>
-            <div class="row">
-                <div class="col text-center">
+            <div className="row">
+                <div className="col text-center">
                 <Button variant="outlined" onClick={submit}>CREATE</Button>
                 <p className="mt-5">
                     {error !== ''? error: ''}

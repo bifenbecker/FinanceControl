@@ -47,10 +47,12 @@ const ChooseCategoryModal = (props) => {
                 name: name,
                 isIncome: isIncome
             }
-            
-            const response = await create_category(body);
-            const content = await response.json();
-            props.categoryList.push(content);   
+            const request = await create_category;
+            const response = await request(body);
+            if(response !== undefined){
+                const content = await response.json();
+                props.categoryList.push(content);
+            }
         }
         setIsClickedCreateCategory(false);
     }

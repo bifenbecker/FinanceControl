@@ -7,16 +7,13 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import PersonAdd from '@mui/icons-material/PersonAdd';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 
-import Home from '../pages/Home';
 import ProfileModal from './ProfileModal';
 import SettingsModal from './SettingsModal';
 
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
+
 
 
 const ProfileMenu = (props) => {
@@ -65,7 +62,8 @@ const ProfileMenu = (props) => {
                 display: 'block',
                 position: 'absolute',
                 top: 0,
-                right: 14,
+                right: 0,
+                left: 15,
                 width: 10,
                 height: 10,
                 bgcolor: 'background.paper',
@@ -86,7 +84,7 @@ const ProfileMenu = (props) => {
             <ListItemIcon>
                 <Settings fontSize="small" />
             </ListItemIcon>Settings
-            <SettingsModal openModal={openSettingsModal} setOpen={setOpenSettingsModal} handleClose={handleClose}/>
+            <SettingsModal openModal={openSettingsModal} setOpen={setOpenSettingsModal} handleClose={handleClose} user={props.user} setUser={props.setUser}/>
             </MenuItem>
             <MenuItem onClick={props.logout}>
             <ListItemIcon>

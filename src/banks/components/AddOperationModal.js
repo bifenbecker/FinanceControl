@@ -29,7 +29,7 @@ const AddOperationModal = (props) => {
             aria-describedby="modal-modal-description"
         >
             <Box sx={style}>
-                <AddOperation handleClose={props.handleClose} bill={props.bill} setNavValue={props.setNavValue}/>
+                <AddOperation settings={props.settings} handleClose={props.handleClose} bill={props.bill} setNavValue={props.setNavValue}/>
             </Box>
         </Modal>
         </div>

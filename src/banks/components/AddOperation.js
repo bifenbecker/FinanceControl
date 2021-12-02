@@ -2,8 +2,6 @@ import React, {useState, useEffect} from 'react';
 
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import NumberFormat from 'react-number-format';
-import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 
 import TabContext from '@mui/lab/TabContext';
@@ -13,36 +11,9 @@ import Tab from '@mui/material/Tab';
 
 import ChooseCategoryModal from './ChooseCategoryModal';
 import ChooseBillModal from './ChooseBillModal';
+import NumberFormatCustom from './NumberFormatInput';
 
 import {category_list, bill_list, add_operation} from '../utils'
-
-
-const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, ref) {
-    const { onChange, ...other } = props;
-
-    return (
-        <NumberFormat
-            {...other}
-            getInputRef={ref}
-            onValueChange={(values) => {
-                onChange({
-                    target: {
-                    name: props.name,
-                    value: values.value,
-                    },
-                });
-            }}
-                thousandSeparator
-                isNumericString
-                prefix={"$"}
-        />
-    );
-    });
-    
-    NumberFormatCustom.propTypes = {
-        name: PropTypes.string.isRequired,
-        onChange: PropTypes.func.isRequired,
-    };
 
 
 export default function AddOperation(props) {
@@ -55,7 +26,7 @@ export default function AddOperation(props) {
     const [bill, setBill] = React.useState(props.bill);
     const [date, setDate] = React.useState(new Date());
     const [description, setDescription] = React.useState('');
-    const [error, setError] = React.useState('');
+    const [error, setError] = React.useState(undefined);
 
     const [openChooseCategoryModal, setChooseCategoryModal] = React.useState(false);
     const [openChooseBillModal, setChooseBillModal] = React.useState(false);
@@ -63,45 +34,56 @@ export default function AddOperation(props) {
     const [isSendRequest, setIsSendRequest] = useState(false);
     
     const submit = async () => {
-        console.log({
-            category,
-            description,
-            value,
-            isIncome,
-            bill
-        })
-        const response = await add_operation({
-            category: category.id,
-            description,
-            value,
-            isIncome,
-        }, bill.uuid);
-        const content = await response.json();
-        props.setNavValue('5')
-        props.handleClose();
+        if(bill !== undefined) {
+            const request = await add_operation;
+            const response = await request({
+                category: category.id,
+                description,
+                value,
+                isIncome,
+            }, bill.uuid);
+            if(response !== undefined){
+                props.handleClose();
+                setError(undefined);
+            }
+            else{
+                setError('No success of adding operation');
+            }
+            
+        }
+        else{
+            setError('Choose bill');
+        }
+        
     }
     const handleChange = (event, newValue) => {
         setNavValue(newValue);
     };
 
-    // TODO: Fix all time requests
     useEffect(() => {
         (
             async () => {
                 if(localStorage.getItem('access_token') !== null){
                     if(categoryList === undefined && billList === undefined && isSendRequest === false){
-                        let response = await category_list();
-                    
-                        if(response.status === 200){
-                            const content = await response.json();
-                            setCategoryList(content.map((category) => category));
+                        let request = await category_list;
+                        let response = await request();
+                        
+                        if(response !== undefined){
+                            if(response.status === 200){
+                                const content = await response.json();
+                                setCategoryList(content.map((category) => category));
+                            }
                         }
-                        response = await bill_list();
-                    
-                        if(response.status === 200){
-                            const content = await response.json();
-                            setBillList(content.map((bill) => bill));
+                        request = await bill_list;
+                        response = await request();
+                        
+                        if(response !== undefined){
+                            if(response.status === 200){
+                                const content = await response.json();
+                                setBillList(content.map((bill) => bill));
+                            }
                         }
+                        
                         setIsSendRequest(true);
                     }
                     
@@ -119,7 +101,7 @@ export default function AddOperation(props) {
                                     label={isIncome? `+${value}`: `-${value}`}
                                     defaultValue={value}
                                     onChange={e => setValue(e.target.value)}
-                                    name={isIncome? "income":"payment"}
+                                    name={props.settings? props.settings.currency.char : null}
                                     id="formatted-numberformat-input"
                                     InputProps={{
                                         inputComponent: NumberFormatCustom
@@ -150,7 +132,7 @@ export default function AddOperation(props) {
                                     variant="standard"
                                     onClick={e => {setChooseBillModal(true)}}
                                 />
-                                <ChooseBillModal openModal={openChooseBillModal} setOpen={setChooseBillModal} billList={billList} setBill={setBill}/>
+                                <ChooseBillModal settings={props.settings} openModal={openChooseBillModal} setOpen={setChooseBillModal} billList={billList} setBill={setBill}/>
                             </div>
                             {/* //TODO: Change on date */}
                             <div className="m-5">
@@ -176,11 +158,11 @@ export default function AddOperation(props) {
                                 />
                             </div>
 
-                            <div class="row">
-                                <div class="col text-center">
+                            <div className="row">
+                                <div className="col text-center">
                                 <Button variant="outlined" onClick={submit}>CREATE</Button>
                                 <p className="mt-5">
-                                    {error !== ''? error: ''}
+                                    {error !== undefined? error: null}
                                 </p>
                                 </div>
                             </div>

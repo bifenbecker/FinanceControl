@@ -2,13 +2,13 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import { blue, grey } from '@mui/material/colors';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
-
+import { convertValue } from '../utils';
 
 
 const BillList = (props) => {
+    // In modal view
 
     const handleListItemClick = (event, bill) => {
         props.setBill(bill);
@@ -18,7 +18,9 @@ const BillList = (props) => {
 
     
     if(props.billList[0] !== undefined) {
+        
         list = props.billList.map((bill) => {
+            // let convertedBalance = convertValue(props.bill.currency, props.settings.currency.name, props.bill.balance) + props.settings.currency.char;
             return (
                 <ListItemButton
                 onClick={(event) => handleListItemClick(event, bill)}
@@ -39,7 +41,7 @@ const BillList = (props) => {
                             ml: 3
                         }}
                         primary={bill.name} 
-                        secondary={"Current balance: " + bill.balance}// TODO: load currency
+                        secondary={"Current balance: " + bill.balance}
                     />
                 </ListItemButton>
             
