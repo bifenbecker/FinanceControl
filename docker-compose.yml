@@ -47,8 +47,8 @@ services:
   logger:
     build: ./logger
     command: python consumer.py
-    environment:
-      - RABBITMQ_HOST=rabbitmq3
+    env_file:
+      - ./logger/.env.dev
     depends_on:
       - rabbitmq3
 
