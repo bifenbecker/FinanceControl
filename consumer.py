@@ -1,9 +1,23 @@
-import os
 import datetime
 import pika
+import os
 
-credentials = pika.PlainCredentials('admin', 'admin')
-params = pika.ConnectionParameters(os.environ.get('RABBITMQ_HOST', 'localhost'), credentials=credentials)
+# todo: Fix
+# from django.conf import settings
+# settings.configure()
+# credentials = pika.PlainCredentials(settings.RABBITMQ_USER, settings.RABBITMQ_PASSWORD)
+#
+# params = pika.ConnectionParameters(settings.RABBITMQ_HOST, credentials=credentials)
+
+
+# region RABBITMQ
+RABBITMQ_HOST = os.environ.get('RABBITMQ_HOST', 'localhost')
+RABBITMQ_USER = os.environ.get('RABBITMQ_USER', 'localhost')
+RABBITMQ_PASSWORD = os.environ.get('RABBITMQ_PASSWORD', 'localhost')
+# endregion
+credentials = pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASSWORD)
+
+params = pika.ConnectionParameters(RABBITMQ_HOST, credentials=credentials)
 
 connection = pika.BlockingConnection(params)
 
